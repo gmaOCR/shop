@@ -120,5 +120,5 @@ if __name__ == "__main__":
     else:
         print("Un ou les deux serveurs ne sont pas opérationnels.")
 
-    input("Appuyez sur Entrée pour quitter...")
+    input("Appuyez sur Entrée pour arrêter les serveurs...")
     stop_servers(django_process, vite_process)
