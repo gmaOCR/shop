@@ -11,9 +11,9 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      <h1>Django React Vite Boilerplate</h1>
-      <p>Message from API: {message}</p>
+    <div className="flex flex-col items-center h-[100vh] justify-center">
+      <h1 className=" rounded-lg p-3 bg-clip-text text-transparent bg-gradient-to-r from-violet-500 to-red-500 via-green-500 my-3">Django React Vite Tailwind Boilerplate</h1>
+      <h2>Message from API: <span className="text-pink-600">{message}</span></h2>
     </div>
   );
 }

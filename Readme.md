@@ -30,6 +30,13 @@ Avant de commencer, assurez-vous que vous avez installé les outils suivants :
     pipenv install
     ```
 
+4. **Installer les dépendances Node :**
+
+    ```bash
+    cd frontend
+    npm install
+    ```
+
 4. **Lancer le script pour démarrer les serveurs Django et Vite :**
 
     ```bash

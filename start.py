@@ -79,9 +79,7 @@ def check_vite():
     while time.time() - start_time < timeout_seconds:
         try:
             # Tester la route principale du serveur Vite
-            response = requests.get("http://localhost:5173/", timeout=2)
-            # print("Statut de la réponse:", response.status_code)
-            # print("Contenu de la réponse:", response.text[:200])  
+            response = requests.get("http://localhost:5173/", timeout=2) 
             
             if response.status_code == 200 and '<!doctype html>' in response.text:
                 print("Serveur Vite opérationnel.")
