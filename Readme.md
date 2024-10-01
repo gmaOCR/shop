@@ -37,13 +37,22 @@ Avant de commencer, assurez-vous que vous avez installé les outils suivants :
     npm install
     ```
 
-4. **Lancer le script pour démarrer les serveurs Django et Vite :**
+5. **(optionnel) Lancer le script pour démarrer les serveurs Django et Vite :**
 
     ```bash
     pipenv run python start.py
     ```
 
     Ce script démarrera les serveurs de développement pour Django et Vite. Assurez-vous que les ports utilisés (8000 pour Django et 5173 pour Vite) sont disponibles.
+
+6. **(optionnel) Installer Shadcn depuis ui.shadcn.com :**
+    Depuis le répertoire [frontend]
+
+    ```bash
+    npx shadcn@latest init
+    ```
+
+    Répondez aux questions affichées dans la console suivant vos préférences
 
 ## Accès aux Serveurs
 
