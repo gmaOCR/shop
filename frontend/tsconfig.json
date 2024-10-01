@@ -20,6 +20,7 @@
     "noFallthroughCasesInSwitch": true,
 
     /* shadcn config */
+    "jsx": "react-jsx", 
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
