@@ -1,23 +1,42 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
+import Menu from 'components/Menu'
+import ItemList from 'components/ItemsList'
+import Cart from './components/Cart'
 
 function App() {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState('')
+
+  const savedCart = localStorage.getItem('cart')
+  const [cartItems, updateCart] = useState(
+    savedCart ? JSON.parse(savedCart) : [],
+  )
+  useEffect(() => {
+    console.log('État du panier mis à jour:', cartItems)
+    localStorage.setItem('cart', JSON.stringify(cartItems))
+  }, [cartItems])
+
+  const disableRightClick = (event) => {
+    event.preventDefault()
+  }
 
   useEffect(() => {
     fetch('/api/hello/')
       .then((response) => response.json())
       .then((data) => setMessage(data.message))
-      .catch((error) => console.error('Error fetching message:', error));
-  }, []);
+      .catch((error) => console.error('Error fetching message:', error))
+  }, [])
 
   return (
-    <div className=" bg-zinc-700 flex flex-col items-center h-[100vh] justify-center">
-      <h1 className=" rounded-lg p-3 bg-clip-text text-transparent bg-gradient-to-r from-violet-500 to-red-500 via-green-500 my-3">
-        [Django REST/ React/ Tailwind] Vite + Shadcn <br/>ready to use
-        </h1>
-      <h2>Message from API: <span className="text-pink-600">{message}</span></h2>
+    <div>
+      <Menu />
+      <ItemList
+        disableRightClick={disableRightClick}
+        updateCart={updateCart}
+        cartItems={cartItems}
+      />
+      <Cart cartItems={cartItems} updateCart={updateCart} />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
