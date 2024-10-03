@@ -7,7 +7,8 @@ import {
   CardHeader,
   CardFooter,
 } from 'components/ui/card'
-import AddButton from './AddButton'
+import CustomButton from './Button'
+import { PlusCircledIcon } from '@radix-ui/react-icons'
 import candlesList from '../datas/candles'
 
 function ItemsList({ cartItems, updateCart }) {
@@ -53,7 +54,10 @@ function ItemsList({ cartItems, updateCart }) {
           </CardContent>
           <CardFooter className="flex justify-evenly">
             <p>Price: {candle.price}€</p>
-            <AddButton onClick={() => addToCart(candle)} />
+            <CustomButton
+              onClick={() => addToCart(candle)}
+              IconComponent={PlusCircledIcon}
+            />
           </CardFooter>
         </Card>
       ))}

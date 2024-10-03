@@ -1,12 +1,11 @@
 import React from 'react'
+import CustomButton from './Button'
+import { Cross2Icon } from '@radix-ui/react-icons'
 
 function Cart({ cartItems, updateCart }) {
   console.log('items here', cartItems)
 
-  const total = cartItems.reduce(
-    (acc, item) => acc + (item.totalPrice || 0), // Assurez-vous d'utiliser totalPrice
-    0,
-  )
+  const total = cartItems.reduce((acc, item) => acc + (item.totalPrice || 0), 0)
 
   return (
     <div className="p-4">
@@ -26,7 +25,10 @@ function Cart({ cartItems, updateCart }) {
         </ul>
       )}
       <h3>Total : {total.toFixed(2)}€</h3>
-      <button onClick={() => updateCart([])}>Vider le panier</button>
+      <CustomButton
+        onClick={() => updateCart([])}
+        IconComponent={Cross2Icon}
+      ></CustomButton>
     </div>
   )
 }
