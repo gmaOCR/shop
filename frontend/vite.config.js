@@ -1,13 +1,18 @@
-import path from "path";
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import path from 'path'
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import nodePolyfills from 'rollup-plugin-node-polyfills'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), nodePolyfills()],
+  define: {
+    'process.env': {},
+  },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': path.resolve(__dirname, './src'),
+      'components': path.resolve(__dirname, './src/components'),
     },
   },
   server: {
@@ -19,4 +24,4 @@ export default defineConfig({
       },
     },
   },
-});
+})
