@@ -1,2 +1,5 @@
 /.venv
 backend/django_debug.log
+Maquette.odg
+.prettierrc
+frontend/package-lock.json
