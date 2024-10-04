@@ -3,3 +3,11 @@ backend/django_debug.log
 Maquette.odg
 .prettierrc
 frontend/package-lock.json
+TODO
+*__pycache__*
+backend/db.sqlite3
+backend/.env
+*/media/*
+backend/backend/media/*
+backend/backend/db.sqlite3
+Pipfile.lock

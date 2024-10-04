@@ -9,6 +9,12 @@ djangorestframework = "*"
 requests = "*"
 psutil = "*"
 pillow = "*"
+djangorestframework-simplejwt = "*"
+django-phonenumber-field = {extras = ["phonenumberslite"], version = "*"}
+django-cors-headers = "*"
+drf-excel = "*"
+openpyxl = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
