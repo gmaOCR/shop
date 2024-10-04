@@ -4,8 +4,8 @@ from datetime import timedelta
 DEBUG = True
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=90),  # Durée de vie du token d'accès
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=90),  # Durée de vie du token de rafraîchissement
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=90),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=90),
 }
 
 DATABASES = {

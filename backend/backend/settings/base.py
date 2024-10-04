@@ -58,7 +58,7 @@ LOGGING = {
 
 ## Set authentification and permissions in prod ##
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES':         
+    'DEFAULT_AUTHENTICATION_CLASSES':
         ('rest_framework_simplejwt.authentication.JWTAuthentication',
          'rest_framework.authentication.SessionAuthentication',),
     'DEFAULT_PERMISSION_CLASSES': [],
@@ -66,13 +66,15 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
         'drf_excel.renderers.XLSXRenderer',
-        ),
+            ),
 }
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),  # Durée de vie du token d'accès
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),  # Durée de vie du token de rafraîchissement
+    # Durée de vie du token d'accès
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    # Durée de vie du token de rafraîchissement
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
 MIDDLEWARE = [
@@ -84,6 +86,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'cart.middleware.CartMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -150,4 +153,3 @@ MEDIA_ROOT = BASE_DIR / 'media'
 PHONENUMBER_DB_FORMAT = "E164"
 PHONENUMBER_DEFAULT_FORMAT = "E164"
 PHONENUMBER_DEFAULT_REGION = "FR"
-
