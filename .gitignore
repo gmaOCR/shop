@@ -11,3 +11,6 @@ backend/.env
 backend/backend/media/*
 backend/backend/db.sqlite3
 Pipfile.lock
+.vscode/launch.json
+.vscode/settings.json
+.vscode/tasks.json
