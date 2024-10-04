@@ -7,6 +7,7 @@ class ScentSerializer(serializers.ModelSerializer):
         model = Scent
         fields = ['id', 'name']
 
+
 class ColorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Color
@@ -14,10 +15,11 @@ class ColorSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    scent = ScentSerializer()
-    color = ColorSerializer()
+    scent = serializers.PrimaryKeyRelatedField(
+        queryset=Scent.objects.all(), required=False, allow_null=True)
+    color = serializers.PrimaryKeyRelatedField(
+        queryset=Color.objects.all(), required=False, allow_null=True)
 
-    
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'price', 'image',

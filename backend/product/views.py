@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
 from common.xlsrenderer import CustomXLSXRenderer
 from .models import Product
 from .serializers import ProductSerializer
-from .permissions import IsAdminOrReadOnly 
+from .permissions import IsAdminOrReadOnly
 
 
 class ProductList(generics.ListCreateAPIView):
@@ -12,11 +12,12 @@ class ProductList(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+
 class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAdminOrReadOnly]
-    
+
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
