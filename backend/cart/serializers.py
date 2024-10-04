@@ -1,18 +1,19 @@
 from rest_framework import serializers
 from .models import Cart, CartItem
-from product.serializers import ProductSerializer 
-from user.serializers import CustomUserSerializer  
+from user.serializers import CustomUserSerializer
+
+
+class CartItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartItem
+        fields = ['product', 'quantity']
+
 
 class CartSerializer(serializers.ModelSerializer):
-    user = CustomUserSerializer(read_only=True)
+    user = CustomUserSerializer(read_only=True, required=False)
+    items = CartItemSerializer(many=True, read_only=True)
+    session_id = serializers.CharField(required=False)
 
     class Meta:
         model = Cart
-        fields = ['id', 'user', 'created_at', 'updated_at'] 
-
-class CartItemSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)
-
-    class Meta:
-        model = CartItem
-        fields = ['id', 'cart', 'product', 'quantity']  
+        fields = ['id', 'user', "items", "session_id"]
