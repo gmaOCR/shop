@@ -15,6 +15,10 @@ django-cors-headers = "*"
 drf-excel = "*"
 openpyxl = "*"
 python-dotenv = "*"
+pytest = "*"
+pytest-django = "*"
+ratelimit = "*"
+django-ratelimit = "*"
 
 [dev-packages]
 
