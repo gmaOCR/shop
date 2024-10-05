@@ -1,11 +1,13 @@
 from django.urls import path
-from .views import CartViewSet, CartList, CartDetail, CartCreate
+from .views import CartViewSet, CartList, CartDetailAuthenticated, CartCreate, CartDetailAnonymous
 from django.conf import settings
 
 urlpatterns = [
     path('', CartList.as_view(), name='cart-list'),
-    path('create/', CartCreate.as_view(), name='cart-create'),
-    path('<int:pk>/', CartDetail.as_view(), name='cart-detail'),
+    path('auth/', CartDetailAuthenticated.as_view(),
+         name='cart-detail-auth'),
+    path('anon/<session_id>/', CartDetailAnonymous.as_view(),
+         name='cart-detail-anon'),
 ]
 
 if settings.DEBUG:

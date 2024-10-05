@@ -1,20 +1,25 @@
-from django.utils.deprecation import MiddlewareMixin
-from django.http import JsonResponse
+# from django.utils.deprecation import MiddlewareMixin
 from .models import Cart
+import uuid
 
 
-class CartMiddleware(MiddlewareMixin):
-    def process_request(self, request):
-        if request.user.is_authenticated:
-            # Utilisateur authentifié, on peut continuer
-            return None
-        else:
-            # Utilisateur invité, vérifie si le cookie de session existe
-            session_id = request.COOKIES.get('sessionid')
-            if session_id:
-                # Vérifie si le panier existe pour cette session_id
-                cart = Cart.objects.filter(session_id=session_id).first()
-                if not cart:
-                    # Si aucun panier n'existe, on pourrait créer un panier vide
-                    Cart.objects.create(session_id=session_id)
-            return None
+class CartMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.path.startswith('/static/') or request.path.startswith('/media/'):
+            return self.get_response(request)
+
+        session_id = request.COOKIES.get('sessionid')
+        if not session_id:
+            session_id = uuid.uuid4()
+            request.COOKIES['sessionid'] = session_id
+            request.session['cart_created'] = False
+
+        if not request.session.get('cart_created'):
+            session_id = str(uuid.uuid4()).strip('"')
+            Cart.objects.create(session_id=session_id)
+            request.session['cart_created'] = True
+
+        return self.get_response(request)
