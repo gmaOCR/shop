@@ -1,5 +1,5 @@
 import React from 'react'
-import { navigationMenuTriggerStyle } from 'components/ui/navigation-menu'
+import { navigationMenuTriggerStyle } from '@/components/ui/navigation-menu'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -7,7 +7,7 @@ import {
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-} from 'components/ui/navigation-menu'
+} from '@/components/ui/navigation-menu'
 
 const Menu = () => (
   <NavigationMenu className="">

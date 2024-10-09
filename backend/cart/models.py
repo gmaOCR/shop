@@ -4,6 +4,7 @@ from user.models import CustomUser
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
+import uuid
 
 
 class Cart(models.Model):
@@ -11,7 +12,8 @@ class Cart(models.Model):
         CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    session_id = models.UUIDField(editable=False, unique=True)
+    session_id = models.CharField(
+        max_length=40, unique=True, null=True, blank=True)
 
 
 class CartItem(models.Model):

@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'api',
-    'cart',
+    'cart.apps.CartConfig',
     'order',
     'product',
     'user',
@@ -49,7 +49,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
         'drf_excel.renderers.XLSXRenderer',
-        ),
+    ),
 }
 
 
@@ -69,7 +69,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'cart.middleware.CartMiddleware',
+    # 'cart.middleware.CartMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -136,3 +136,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 PHONENUMBER_DB_FORMAT = "E164"
 PHONENUMBER_DEFAULT_FORMAT = "E164"
 PHONENUMBER_DEFAULT_REGION = "FR"
+
+SESSION_COOKIE_NAME = 'session_id'
+SESSION_COOKIE_AGE = 60 * 60
+
+# SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"

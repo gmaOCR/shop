@@ -4,9 +4,10 @@
 cd "$(dirname "$0")"/..
 
 echo "Current directory: $(pwd)"
+export PYTHONPATH=$PYTHONPATH:$(pwd)
 echo "Python path: $PYTHONPATH"
 
-export PYTHONPATH=$PYTHONPATH:$(pwd)
 
 # Start Celery worker
+#pipenv run celery -A backend.celery_app worker -B -l debug
 pipenv run celery -A backend.celery_app worker -B -l info

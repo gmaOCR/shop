@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CartViewSet, CartList, CartDetailAuthenticated, CartCreate, CartDetailAnonymous
+from .views import CartViewSet, CartList, CartDetailAuthenticated, CartDetailAnonymous
 from django.conf import settings
 
 urlpatterns = [
@@ -8,6 +8,7 @@ urlpatterns = [
          name='cart-detail-auth'),
     path('anon/<session_id>/', CartDetailAnonymous.as_view(),
          name='cart-detail-anon'),
+
 ]
 
 if settings.DEBUG:

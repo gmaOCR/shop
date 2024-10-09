@@ -1,30 +1,29 @@
-import { useEffect, useState } from 'react'
-import Menu from 'components/Menu'
-import ItemList from 'components/ItemsList'
-import Cart from './components/Cart'
+import { useState, useEffect } from 'react'
+import Menu from '@/components/Menu'
+import ItemList from '@/components/ItemsList'
+import Cart from '@/components/Cart'
+import useAnonymousCart from '@/components/hooks/useAnonymousCart'
+
+localStorage.clear()
 
 function App() {
-  const [message, setMessage] = useState('')
-
-  const savedCart = localStorage.getItem('cart')
-  const [cartItems, updateCart] = useState(
-    savedCart ? JSON.parse(savedCart) : [],
-  )
-  useEffect(() => {
-    console.log('État du panier mis à jour:', cartItems)
-    localStorage.setItem('cart', JSON.stringify(cartItems))
-  }, [cartItems])
+  const { cart, updateCart, loading, error } = useAnonymousCart()
 
   const disableRightClick = (event) => {
     event.preventDefault()
   }
 
   useEffect(() => {
-    fetch('/api/hello/')
-      .then((response) => response.json())
-      .then((data) => setMessage(data.message))
-      .catch((error) => console.error('Error fetching message:', error))
-  }, [])
+    console.log('Cart state changed:', cart)
+  }, [cart])
+
+  if (loading) {
+    return <div>Chargement...</div>
+  }
+
+  if (error) {
+    return <div>Erreur: {error}</div>
+  }
 
   return (
     <div>
@@ -32,9 +31,10 @@ function App() {
       <ItemList
         disableRightClick={disableRightClick}
         updateCart={updateCart}
-        cartItems={cartItems}
+        cart={cart}
+        sessionId={cart ? cart.session_id : null}
       />
-      <Cart cartItems={cartItems} updateCart={updateCart} />
+      <Cart cart={cart} updateCart={updateCart} />
     </div>
   )
 }

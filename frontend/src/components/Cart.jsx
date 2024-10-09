@@ -2,33 +2,39 @@ import React from 'react'
 import CustomButton from './Button'
 import { Cross2Icon } from '@radix-ui/react-icons'
 
-function Cart({ cartItems, updateCart }) {
-  console.log('items here', cartItems)
-
-  const total = cartItems.reduce((acc, item) => acc + (item.totalPrice || 0), 0)
+function Cart({ cart, updateCart }) {
+  if (!cart || !cart.items || cart.items.length === 0) {
+    return <div>Your cart is empty</div>
+  }
+  console.log('Cart:', cart)
 
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold">Votre panier</h2>
-      {cartItems.length === 0 ? (
-        <p>Le panier est vide.</p>
-      ) : (
+      <p>Session ID: {cart.session_id}</p>
+
+      {cart.items && cart.items.length > 0 ? (
         <ul>
-          {cartItems.map((item) => (
-            <li key={item.id} className="flex justify-between">
-              <span>
-                {item.name} (x{item.quantity || 1})
-              </span>
-              <span>{item.totalPrice.toFixed(2)}€</span>{' '}
-            </li>
-          ))}
+          {cart && cart.items && cart.items.length > 1 ? (
+            cart.items.map((item, index) => (
+              <li key={item.product_id || index}>
+                Product ID: {item.product_id}, Quantity: {item.quantity}
+              </li>
+            ))
+          ) : (
+            <li>Your cart is empty</li>
+          )}
         </ul>
+      ) : (
+        <p>Le panier est vide.</p>
       )}
-      <h3>Total : {total.toFixed(2)}€</h3>
+
       <CustomButton
-        onClick={() => updateCart([])}
+        onClick={() => updateCart({ ...cart, items: [] })}
         IconComponent={Cross2Icon}
-      ></CustomButton>
+      >
+        Vider le panier
+      </CustomButton>
     </div>
   )
 }

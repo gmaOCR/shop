@@ -1,0 +1,3 @@
+[run]
+omit = */migrations/*, *__init__*
+include = api/*,cart/*,order/*,product/*,user/*

@@ -1,13 +1,19 @@
 from rest_framework import generics, viewsets
 from django.utils import timezone
+from rest_framework import status
+from functools import wraps
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser, AllowAny, IsAuthenticated
-
 from common.xlsrenderer import CustomXLSXRenderer
 from .models import Cart
-from .serializers import CartSerializer
+from .serializers import CartSerializer, CartItemSerializer
 
-import uuid
+
+def forbidden(view_func):
+    @wraps(view_func)
+    def wrapper(*args, **kwargs):
+        return Response({"error": "Method not allowed"}, status=status.HTTP_403_FORBIDDEN)
+    return wrapper
 
 
 class CartList(generics.ListCreateAPIView):
@@ -20,8 +26,8 @@ class CartDetailAuthenticated(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CartSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        return Cart.objects.filter(user=self.request.user)
+    def get_object(self):
+        return Cart.objects.get(user=self.request.user)
 
 
 class CartDetailAnonymous(generics.RetrieveUpdateDestroyAPIView):
@@ -30,45 +36,18 @@ class CartDetailAnonymous(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        session_id = self.request.COOKIES.get('sessionid')
-        if not session_id:
-            session_id = uuid.uuid4()
-            self.request.COOKIES['sessionid'] = session_id
+        session_id = self.request.COOKIES.get('session_id')
         return Cart.objects.filter(session_id=session_id)
 
-    def retrieve(self, request, *args, **kwargs):
-        session_id = request.COOKIES.get('sessionid')
-
-        if not session_id:
-            session_id = uuid.uuid4()
-            response = super().retrieve(request, *args, **kwargs)
-
-            cart = Cart.objects.create(session_id=session_id)
-            response.set_cookie('sessionid', session_id, max_age=900)
-
-            return Response(CartSerializer(cart).data)
-        else:
-            queryset = self.get_queryset()
-            cart = queryset.first()
-            if not cart:
-                cart = Cart.objects.create(session_id=session_id)
-                return Response(CartSerializer(cart).data)
-
-            return super().retrieve(request, *args, **kwargs)
+    @forbidden
+    def create(self, request, *args, **kwargs):
+        pass
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.last_updated = timezone.now()
         instance.save()
         return super().update(request, *args, **kwargs)
-
-
-class CartCreate(generics.CreateAPIView):
-    serializer_class = CartSerializer
-    permission_classes = [AllowAny]
-
-    # def perform_create(self, serializer):
-    #     # voir middleware.py de l'app pour cette partie
 
 
 class CartViewSet(viewsets.ModelViewSet):  # pragma: no cover

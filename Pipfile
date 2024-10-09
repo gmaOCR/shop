@@ -21,6 +21,9 @@ ratelimit = "*"
 django-ratelimit = "*"
 celery = "*"
 django-celery-results = "*"
+pprintpp = "*"
+coverage = "*"
+pytest-cov = "*"
 
 [dev-packages]
 

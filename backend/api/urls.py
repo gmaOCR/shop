@@ -6,7 +6,7 @@ urlpatterns = [
     path('hello/', hello_world, name='hello_world'),
 
     path('products/', include('product.urls')),
-    path('cart/', include('cart.urls')),
+    path('carts/', include('cart.urls')),
     path('users/', include('user.urls')),
 
     path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
