@@ -4,7 +4,6 @@ import CartItem from './CartItem'
 import { toast } from 'react-hot-toast'
 import useCartItems from './hooks/useCartItems'
 
-// Utilisation de memo pour optimiser le rendu des éléments enfants
 const MemoizedCartItem = memo(CartItem)
 
 function ItemsList({ cart: initialCart, disableRightClick, saveCart }) {
@@ -26,16 +25,16 @@ function ItemsList({ cart: initialCart, disableRightClick, saveCart }) {
       }
     }
     fetchProducts()
-  }, [getProducts]) // Ajout de getProducts comme dépendance
+  }, [getProducts])
 
   useEffect(() => {
     setLocalCart(initialCart)
   }, [initialCart])
 
   const handleAddToCart = useCallback(
-    async (productId) => {
+    async (product) => {
       try {
-        const updatedCart = await addOrUpdateCartItem(productId, 1)
+        const updatedCart = await addOrUpdateCartItem(product, 1)
         setLocalCart(updatedCart)
         await saveCart(updatedCart)
         toast.success('Produit ajouté au panier')
@@ -64,7 +63,7 @@ function ItemsList({ cart: initialCart, disableRightClick, saveCart }) {
         <MemoizedCartItem
           key={product.id}
           product={product}
-          onAddToCart={handleAddToCart}
+          onAddToCart={() => handleAddToCart(product)}
           disabled={cartLoading}
         />
       ))}

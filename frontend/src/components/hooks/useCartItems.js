@@ -1,43 +1,119 @@
-import { useCallback } from 'react'
+import { useState, useCallback } from 'react'
 
-export default function useCartItems(initialCart = { items: [] }) {
+const useCartItems = (initialCart = { items: [] }) => {
+  const [cart, setCart] = useState(initialCart)
+  const [loading, setLoading] = useState(false)
+
   const addOrUpdateCartItem = useCallback(
-    async (productId, quantity) => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          const updatedCart = {
-            ...initialCart,
-            items: [...(initialCart.items || [])],
-          }
+    async (product, quantity) => {
+      setLoading(true)
+      try {
+        const updatedCart = { ...cart }
+        const existingItemIndex = updatedCart.items.findIndex(
+          (item) => item.product.id === product.id,
+        )
 
-          const existingItem = updatedCart.items.find(
-            (item) => item.product_id === productId,
-          )
+        if (existingItemIndex !== -1) {
+          // Le produit existe déjà, mettre à jour la quantité
+          updatedCart.items[existingItemIndex].quantity += quantity
+        } else {
+          // Ajouter un nouveau produit
+          updatedCart.items.push({
+            product: {
+              id: product.id,
+              name: product.name,
+              description: product.description,
+              price: product.price,
+              image: product.image,
+              // Ajoutez ici tous les autres champs nécessaires du produit
+            },
+            quantity: quantity,
+          })
+        }
 
-          if (existingItem) {
-            // Si l'item existe, mettre à jour sa quantité
-            updatedCart.items = updatedCart.items.map((item) =>
-              item.product_id === productId
-                ? { ...item, quantity: item.quantity + quantity }
-                : item,
-            )
-          } else {
-            // Sinon, ajouter un nouvel item
-            updatedCart.items.push({ product_id: productId, quantity })
-          }
+        // Mettre à jour la date de mise à jour
+        updatedCart.updated_at = new Date().toISOString()
 
-          // Mettre à jour la date de mise à jour
-          updatedCart.updated_at = new Date().toISOString()
-
-          resolve(updatedCart)
-        }, 100) // Simuler un délai de 500ms
-      })
+        setCart(updatedCart)
+        return updatedCart
+      } catch (error) {
+        console.error('Error updating cart:', error)
+        throw error
+      } finally {
+        setLoading(false)
+      }
     },
-    [initialCart],
+    [cart],
   )
 
+  const removeCartItem = useCallback(
+    async (productId) => {
+      setLoading(true)
+      try {
+        const updatedCart = {
+          ...cart,
+          items: cart.items.filter((item) => item.product.id !== productId),
+        }
+        updatedCart.updated_at = new Date().toISOString()
+        setCart(updatedCart)
+        return updatedCart
+      } catch (error) {
+        console.error('Error removing item from cart:', error)
+        throw error
+      } finally {
+        setLoading(false)
+      }
+    },
+    [cart],
+  )
+
+  const updateCartItemQuantity = useCallback(
+    async (productId, newQuantity) => {
+      setLoading(true)
+      try {
+        const updatedCart = {
+          ...cart,
+          items: cart.items.map((item) =>
+            item.product.id === productId
+              ? { ...item, quantity: newQuantity }
+              : item,
+          ),
+        }
+        updatedCart.updated_at = new Date().toISOString()
+        setCart(updatedCart)
+        return updatedCart
+      } catch (error) {
+        console.error('Error updating item quantity:', error)
+        throw error
+      } finally {
+        setLoading(false)
+      }
+    },
+    [cart],
+  )
+
+  const clearCart = useCallback(async () => {
+    setLoading(true)
+    try {
+      const updatedCart = { items: [], updated_at: new Date().toISOString() }
+      setCart(updatedCart)
+      return updatedCart
+    } catch (error) {
+      console.error('Error clearing cart:', error)
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
   return {
+    cart,
+    loading,
     addOrUpdateCartItem,
-    loading: false, // Nous pourrions ajouter un état de chargement réel si nécessaire
+    removeCartItem,
+    updateCartItemQuantity,
+    clearCart,
   }
 }
+
+export default useCartItems
