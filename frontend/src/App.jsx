@@ -5,7 +5,8 @@ import ItemList from '@/components/ItemsList'
 import Cart from '@/components/Cart'
 import useAnonymousCart from '@/components/hooks/useAnonymousCart'
 
-localStorage.clear()
+// For dev only
+// localStorage.clear()
 
 function App() {
   const { cart, loading, error, saveCart } = useAnonymousCart()
@@ -27,14 +28,14 @@ function App() {
   }
 
   return (
-    <div>
+    <div className="px-[10%]">
       <Menu />
       <ItemList
         disableRightClick={disableRightClick}
         saveCart={handleUpdateCart}
         cart={cart}
       />
-      <Cart cart={cart} updateCart={handleUpdateCart} />
+      <Cart cart={cart} saveCart={handleUpdateCart} />
     </div>
   )
 }

@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardFooter,
 } from '@/components/ui/card'
-import CustomButton from './Button'
+import CustomButton from './CustomButton'
 import { PlusCircledIcon } from '@radix-ui/react-icons'
 
 const CartItem = ({ product, onAddToCart, disabled }) => {

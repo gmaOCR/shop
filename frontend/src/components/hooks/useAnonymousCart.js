@@ -15,26 +15,35 @@ const useAnonymousCart = () => {
           `anonymousCart_${storedSessionId}`,
         )
         if (storedCart) {
-          setCart(JSON.parse(storedCart))
-          return
+          const storedCartData = JSON.parse(storedCart)
+          const lastUpdated = storedCartData.updated_at
+          const currentCart = { ...storedCartData, items: [] } // Create a new cart with empty items
+          currentCart.updated_at = new Date().toISOString()
+          if (lastUpdated !== currentCart.updated_at) {
+            // Cart data has been updated, use the new cart state
+            setCart(currentCart)
+          } else {
+            // Cart data is up-to-date, use the stored cart state
+            setCart(storedCartData)
+          }
+        } else {
+          // No cart data found, create a new cart
+          const newSessionId = uuidv4()
+          const newCart = {
+            items: [],
+            user: {},
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            session_id: newSessionId,
+          }
+          localStorage.setItem('anonymousCartSessionId', newSessionId)
+          localStorage.setItem(
+            `anonymousCart_${newSessionId}`,
+            JSON.stringify(newCart),
+          )
+          setCart(newCart)
         }
       }
-
-      // Si aucun cart n'est trouvé, on en crée un nouveau
-      const newSessionId = uuidv4()
-      const newCart = {
-        items: [],
-        user: {},
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        session_id: newSessionId,
-      }
-      localStorage.setItem('anonymousCartSessionId', newSessionId)
-      localStorage.setItem(
-        `anonymousCart_${newSessionId}`,
-        JSON.stringify(newCart),
-      )
-      setCart(newCart)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -48,6 +57,9 @@ const useAnonymousCart = () => {
 
   const saveCart = useCallback((updatedCart) => {
     if (updatedCart && updatedCart.session_id) {
+      if (updatedCart.items && updatedCart.items.length > 0) {
+        updatedCart.updated_at = new Date().toISOString()
+      }
       localStorage.setItem(
         `anonymousCart_${updatedCart.session_id}`,
         JSON.stringify(updatedCart),
@@ -55,7 +67,6 @@ const useAnonymousCart = () => {
       setCart(updatedCart)
     }
   }, [])
-
   return { cart, loading, error, saveCart }
 }
 

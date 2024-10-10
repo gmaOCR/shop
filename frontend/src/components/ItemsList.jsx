@@ -56,7 +56,7 @@ function ItemsList({ cart: initialCart, disableRightClick, saveCart }) {
 
   return (
     <div
-      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-[10%]"
+      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"
       onContextMenu={disableRightClick}
     >
       {data.map((product) => (
