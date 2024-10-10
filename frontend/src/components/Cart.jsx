@@ -6,7 +6,7 @@ function Cart({ cart, updateCart }) {
   if (!cart || !cart.items || cart.items.length === 0) {
     return <div>Your cart is empty</div>
   }
-  console.log('Cart:', cart)
+  console.log('Cart:', JSON.stringify(cart, null, 2))
 
   return (
     <div className="p-4">
@@ -15,15 +15,11 @@ function Cart({ cart, updateCart }) {
 
       {cart.items && cart.items.length > 0 ? (
         <ul>
-          {cart && cart.items && cart.items.length > 1 ? (
-            cart.items.map((item, index) => (
-              <li key={item.product_id || index}>
-                Product ID: {item.product_id}, Quantity: {item.quantity}
-              </li>
-            ))
-          ) : (
-            <li>Your cart is empty</li>
-          )}
+          {cart.items.map((item) => (
+            <li key={item.id}>
+              {item.name} - Prix: {item.price} € - Quantité: {item.quantity}
+            </li>
+          ))}
         </ul>
       ) : (
         <p>Le panier est vide.</p>
