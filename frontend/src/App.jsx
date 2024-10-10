@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+// App.js
+import React from 'react'
 import Menu from '@/components/Menu'
 import ItemList from '@/components/ItemsList'
 import Cart from '@/components/Cart'
@@ -7,15 +8,15 @@ import useAnonymousCart from '@/components/hooks/useAnonymousCart'
 localStorage.clear()
 
 function App() {
-  const { cart, updateCart, loading, error } = useAnonymousCart()
+  const { cart, loading, error, saveCart } = useAnonymousCart()
+
+  const handleUpdateCart = (newCart) => {
+    saveCart(newCart)
+  }
 
   const disableRightClick = (event) => {
     event.preventDefault()
   }
-
-  useEffect(() => {
-    console.log('Cart state changed:', cart)
-  }, [cart])
 
   if (loading) {
     return <div>Chargement...</div>
@@ -30,11 +31,10 @@ function App() {
       <Menu />
       <ItemList
         disableRightClick={disableRightClick}
-        updateCart={updateCart}
+        saveCart={handleUpdateCart}
         cart={cart}
-        sessionId={cart ? cart.session_id : null}
       />
-      <Cart cart={cart} updateCart={updateCart} />
+      <Cart cart={cart} updateCart={handleUpdateCart} />
     </div>
   )
 }

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+// hooks/useAnonymousCart.js
+import { useState, useEffect, useCallback } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
 const useAnonymousCart = () => {
@@ -6,78 +7,56 @@ const useAnonymousCart = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  useEffect(() => {
-    const initializeCart = () => {
-      setLoading(true)
-      try {
-        // Tenter de récupérer la session ID stockée
-        const storedSessionId = localStorage.getItem('anonymousCartSessionId')
-
-        if (storedSessionId) {
-          // Si une session ID existe, tenter de récupérer le panier correspondant
-          const storedCart = localStorage.getItem(
-            `anonymousCart_${storedSessionId}`,
-          )
-          if (storedCart) {
-            setCart(JSON.parse(storedCart))
-          } else {
-            // Si le panier n'existe pas pour cette session ID, créer un nouveau panier
-            createNewCart(storedSessionId)
-          }
-        } else {
-          // Si aucune session ID n'existe, créer un nouveau panier avec une nouvelle session ID
-          createNewCart()
-        }
-      } catch (error) {
-        setError(error.message)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    initializeCart()
-  }, [])
-
-  const createNewCart = (sessionId = uuidv4()) => {
-    const newCart = {
-      user: {},
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      session_id: sessionId,
-      items: [],
-    }
-    setCart(newCart)
-    localStorage.setItem('anonymousCartSessionId', sessionId)
-    localStorage.setItem(`anonymousCart_${sessionId}`, JSON.stringify(newCart))
-  }
-
-  const updateCart = (cartData) => {
-    console.log('Updating cart with:', cartData)
-    setLoading(true)
+  const initializeCart = useCallback(() => {
     try {
-      setCart((prevCart) => {
-        const updatedCart = {
-          ...prevCart, // Préserve tous les champs existants
-          ...cartData, // Applique les nouvelles données
-          updated_at: new Date().toISOString(),
-        }
-        console.log('Updated cart:', updatedCart)
-        localStorage.setItem(
-          `anonymousCart_${updatedCart.session_id}`,
-          JSON.stringify(updatedCart),
+      const storedSessionId = localStorage.getItem('anonymousCartSessionId')
+      if (storedSessionId) {
+        const storedCart = localStorage.getItem(
+          `anonymousCart_${storedSessionId}`,
         )
-        console.log('Cart saved to localStorage')
-        return updatedCart
-      })
-    } catch (error) {
-      console.error('Error updating cart:', error)
-      setError(error.message)
+        if (storedCart) {
+          setCart(JSON.parse(storedCart))
+          return
+        }
+      }
+
+      // Si aucun cart n'est trouvé, on en crée un nouveau
+      const newSessionId = uuidv4()
+      const newCart = {
+        items: [],
+        user: {},
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        session_id: newSessionId,
+      }
+      localStorage.setItem('anonymousCartSessionId', newSessionId)
+      localStorage.setItem(
+        `anonymousCart_${newSessionId}`,
+        JSON.stringify(newCart),
+      )
+      setCart(newCart)
+    } catch (err) {
+      setError(err.message)
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  return { cart, loading, error, updateCart }
+  useEffect(() => {
+    initializeCart()
+  }, [initializeCart])
+
+  const saveCart = useCallback((updatedCart) => {
+    if (updatedCart && updatedCart.session_id) {
+      localStorage.setItem(
+        `anonymousCart_${updatedCart.session_id}`,
+        JSON.stringify(updatedCart),
+      )
+      setCart(updatedCart)
+    }
+  }, [])
+
+  return { cart, loading, error, saveCart }
 }
 
 export default useAnonymousCart

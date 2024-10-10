@@ -1,40 +1,62 @@
-import React from 'react'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useCallback, useState } from 'react'
 import { useProductApi } from './hooks/useProductAPI'
 import CartItem from './CartItem'
 import { toast } from 'react-hot-toast'
 import useCartItems from './hooks/useCartItems'
 
-function ItemsList({ sessionId, disableRightClick, updateCart }) {
+function ItemsList({ cart: initialCart, disableRightClick, saveCart }) {
+  const [localCart, setLocalCart] = useState(initialCart)
   const {
     data,
     loading: productsLoading,
     error: productsError,
     getProducts,
   } = useProductApi()
-  const { addOrUpdateCartItem, loading: cartLoading } = useCartItems(updateCart)
+  const { addOrUpdateCartItem, loading: cartLoading } = useCartItems(localCart)
 
-  React.useEffect(() => {
-    getProducts()
-  }, [])
-
-  const handleAddToCart = async (item) => {
-    try {
-      const updatedCart = await addOrUpdateCartItem(item.id, 1)
-      updateCart(updatedCart) // Pass the updatedCart object to updateCart
-      toast.success(`${item.name} added to cart!`)
-    } catch (error) {
-      console.error('Error adding item to cart:', error)
-      toast.error('Failed to add item to cart. Please try again.')
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        await getProducts()
+      } catch (error) {
+        console.error('Error fetching products:', error)
+      }
     }
-  }
+    fetchProducts()
+  }, [getProducts])
+
+  useEffect(() => {
+    setLocalCart(initialCart)
+  }, [initialCart])
+
+  const handleAddToCart = useCallback(
+    async (item) => {
+      try {
+        console.log('Adding to cart:', item)
+        const updatedCart = await addOrUpdateCartItem(item.id, 1)
+        console.log('Updated cart:', updatedCart)
+
+        if (updatedCart) {
+          setLocalCart(updatedCart)
+          saveCart(updatedCart)
+          toast.success(`${item.name} added to cart!`)
+        } else {
+          throw new Error('Failed to update cart')
+        }
+      } catch (error) {
+        console.error('Error adding item to cart:', error)
+        toast.error('Failed to add item to cart. Please try again.')
+      }
+    },
+    [addOrUpdateCartItem, saveCart],
+  )
 
   if (productsLoading) {
     return <div>Loading...</div>
   }
 
   if (productsError) {
-    return <div>Error: {productsError.message}</div>
+    return <div>Error loading products: {productsError}</div>
   }
 
   return (
@@ -46,7 +68,6 @@ function ItemsList({ sessionId, disableRightClick, updateCart }) {
         <CartItem
           key={product.id}
           product={product}
-          sessionId={sessionId}
           onAddToCart={handleAddToCart}
           disabled={cartLoading}
         />

@@ -1,46 +1,43 @@
-import { useState, useCallback } from 'react'
+import { useCallback } from 'react'
 
-export default function useCartItems() {
-  const [cart, setCart] = useState({ items: [] })
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-
-  // const updateGlobalCart = (newCart) => {
-  //   setCart(newCart)
-  // }
-
+export default function useCartItems(initialCart = { items: [] }) {
   const addOrUpdateCartItem = useCallback(
-    (productId, quantity) => {
-      setLoading(true)
-      return new Promise((resolve, reject) => {
-        const updatedCart = { ...cart }
-        const existingItemIndex = updatedCart.items.findIndex(
-          (item) => item.product_id === productId,
-        )
+    async (productId, quantity) => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const updatedCart = {
+            ...initialCart,
+            items: [...(initialCart.items || [])],
+          }
 
-        if (existingItemIndex !== -1) {
-          // Update existing item quantity
-          updatedCart.items[existingItemIndex].quantity += quantity
-        } else {
-          // Add new item to cart
-          updatedCart.items.push({ product_id: productId, quantity })
-        }
+          const existingItem = updatedCart.items.find(
+            (item) => item.product_id === productId,
+          )
 
-        setCart(updatedCart)
-        resolve(updatedCart)
+          if (existingItem) {
+            // Si l'item existe, mettre à jour sa quantité
+            updatedCart.items = updatedCart.items.map((item) =>
+              item.product_id === productId
+                ? { ...item, quantity: item.quantity + quantity }
+                : item,
+            )
+          } else {
+            // Sinon, ajouter un nouvel item
+            updatedCart.items.push({ product_id: productId, quantity })
+          }
+
+          // Mettre à jour la date de mise à jour
+          updatedCart.updated_at = new Date().toISOString()
+
+          resolve(updatedCart)
+        }, 500) // Simuler un délai de 500ms
       })
-        .then(() => {
-          setLoading(false)
-        })
-        .catch((err) => {
-          console.error('Error in addOrUpdateCartItem:', err)
-          setError(err.message)
-          setLoading(false)
-          reject(err)
-        })
     },
-    [cart, setCart],
+    [initialCart],
   )
 
-  return { addOrUpdateCartItem, loading, error, cart }
+  return {
+    addOrUpdateCartItem,
+    loading: false, // Nous pourrions ajouter un état de chargement réel si nécessaire
+  }
 }
