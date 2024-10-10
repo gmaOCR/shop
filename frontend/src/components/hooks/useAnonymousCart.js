@@ -7,9 +7,52 @@ const useAnonymousCart = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
+  useEffect(() => {
+    const storedSessionId = localStorage.getItem('anonymousCartSessionId')
+    if (storedSessionId) {
+      const storedCart = localStorage.getItem(
+        `anonymousCart_${storedSessionId}`,
+      )
+      if (storedCart) {
+        setCart(JSON.parse(storedCart))
+      } else {
+        const newSessionId = uuidv4()
+        const newCart = {
+          items: [],
+          user: {},
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          session_id: newSessionId,
+        }
+        localStorage.setItem('anonymousCartSessionId', newSessionId)
+        localStorage.setItem(
+          `anonymousCart_${newSessionId}`,
+          JSON.stringify(newCart),
+        )
+        setCart(newCart)
+      }
+    } else {
+      const newSessionId = uuidv4()
+      const newCart = {
+        items: [],
+        user: {},
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        session_id: newSessionId,
+      }
+      localStorage.setItem('anonymousCartSessionId', newSessionId)
+      localStorage.setItem(
+        `anonymousCart_${newSessionId}`,
+        JSON.stringify(newCart),
+      )
+      setCart(newCart)
+    }
+    setLoading(false)
+  }, [])
+
   const initializeCart = useCallback(() => {
     try {
-      const storedSessionId = localStorage.getItem('anonymousCartSessionId')
+      const storedSessionId = localStorage.getItem('anonymousCart_SessionId')
       if (storedSessionId) {
         const storedCart = localStorage.getItem(
           `anonymousCart_${storedSessionId}`,
@@ -36,7 +79,7 @@ const useAnonymousCart = () => {
             updated_at: new Date().toISOString(),
             session_id: newSessionId,
           }
-          localStorage.setItem('anonymousCartSessionId', newSessionId)
+          localStorage.setItem('anonymousCart_SessionId', newSessionId)
           localStorage.setItem(
             `anonymousCart_${newSessionId}`,
             JSON.stringify(newCart),
@@ -67,6 +110,7 @@ const useAnonymousCart = () => {
       setCart(updatedCart)
     }
   }, [])
+
   return { cart, loading, error, saveCart }
 }
 
