@@ -30,7 +30,7 @@ export default function useCartItems(initialCart = { items: [] }) {
           updatedCart.updated_at = new Date().toISOString()
 
           resolve(updatedCart)
-        }, 500) // Simuler un délai de 500ms
+        }, 100) // Simuler un délai de 500ms
       })
     },
     [initialCart],

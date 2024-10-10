@@ -33,22 +33,15 @@ function ItemsList({ cart: initialCart, disableRightClick, saveCart }) {
   }, [initialCart])
 
   const handleAddToCart = useCallback(
-    async (item) => {
+    async (productId) => {
       try {
-        console.log('Adding to cart:', item)
-        const updatedCart = await addOrUpdateCartItem(item.id, 1)
-        console.log('Updated cart:', updatedCart)
-
-        if (updatedCart) {
-          setLocalCart(updatedCart)
-          saveCart(updatedCart)
-          toast.success(`${item.name} added to cart!`)
-        } else {
-          throw new Error('Failed to update cart')
-        }
+        const updatedCart = await addOrUpdateCartItem(productId, 1)
+        setLocalCart(updatedCart)
+        await saveCart(updatedCart)
+        toast.success('Produit ajouté au panier')
       } catch (error) {
-        console.error('Error adding item to cart:', error)
-        toast.error('Failed to add item to cart. Please try again.')
+        console.error('Error adding to cart:', error)
+        toast.error("Erreur lors de l'ajout au panier")
       }
     },
     [addOrUpdateCartItem, saveCart],
