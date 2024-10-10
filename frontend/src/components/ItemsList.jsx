@@ -1,8 +1,11 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import React, { useEffect, useCallback, useState, memo } from 'react'
 import { useProductApi } from './hooks/useProductAPI'
 import CartItem from './CartItem'
 import { toast } from 'react-hot-toast'
 import useCartItems from './hooks/useCartItems'
+
+// Utilisation de memo pour optimiser le rendu des éléments enfants
+const MemoizedCartItem = memo(CartItem)
 
 function ItemsList({ cart: initialCart, disableRightClick, saveCart }) {
   const [localCart, setLocalCart] = useState(initialCart)
@@ -23,7 +26,7 @@ function ItemsList({ cart: initialCart, disableRightClick, saveCart }) {
       }
     }
     fetchProducts()
-  }, [getProducts])
+  }, [getProducts]) // Ajout de getProducts comme dépendance
 
   useEffect(() => {
     setLocalCart(initialCart)
@@ -65,7 +68,7 @@ function ItemsList({ cart: initialCart, disableRightClick, saveCart }) {
       onContextMenu={disableRightClick}
     >
       {data.map((product) => (
-        <CartItem
+        <MemoizedCartItem
           key={product.id}
           product={product}
           onAddToCart={handleAddToCart}
