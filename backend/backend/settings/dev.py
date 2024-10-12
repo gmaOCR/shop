@@ -33,3 +33,6 @@ SESSION_COOKIE_HTTPONLY = False
 
 # Désactiver SameSite pour faciliter le développement local
 SESSION_COOKIE_SAMESITE = None
+
+
+INSTALLED_APPS += ['django_extensions', 'schema_graph',]

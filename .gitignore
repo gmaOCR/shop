@@ -15,3 +15,8 @@ Pipfile.lock
 .vscode/settings.json
 .vscode/tasks.json
 backend/celerybeat-schedule
+backend/all_models.png
+.~lock.UsersStories.ods#
+.gitignore
+*coverage*
+UsersStories.ods

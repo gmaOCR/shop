@@ -1,16 +1,17 @@
 import React from 'react'
-import { renderHook } from '@testing-library/react-hooks'
-import { useAnonymousCart } from './useAnonymousCart'
+import { renderHook, act } from '@testing-library/react'
+import useAnonymousCart from './useAnonymousCart'
 
 describe('useAnonymousCart', () => {
   beforeEach(() => {
     localStorage.clear()
+    jest.resetAllMocks()
   })
 
-  it('should return an empty cart and loading state initially', () => {
+  it('should not return an empty cart and loading state initially', () => {
     const { result } = renderHook(() => useAnonymousCart())
-    expect(result.current.cart).toBeNull()
-    expect(result.current.loading).toBe(true)
+    expect(result.current.cart).not.toBeNull()
+    expect(result.current.loading).toBe(false)
     expect(result.current.error).toBeNull()
   })
 
@@ -51,7 +52,9 @@ describe('useAnonymousCart', () => {
       ...result.current.cart,
       items: [{ id: 1, name: 'Test item' }],
     }
-    result.current.saveCart(updatedCart)
+    act(() => {
+      result.current.saveCart(updatedCart)
+    })
     expect(
       localStorage.getItem(`anonymousCart_${updatedCart.session_id}`),
     ).toEqual(JSON.stringify(updatedCart))
@@ -59,7 +62,7 @@ describe('useAnonymousCart', () => {
 
   it('should handle errors when retrieving or updating the cart', () => {
     const error = new Error('Test error')
-    jest.spyOn(localStorage, 'getItem').mockImplementation(() => {
+    jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
       throw error
     })
 

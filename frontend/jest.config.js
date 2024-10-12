@@ -1,13 +1,12 @@
 export default {
-  preset: '',
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['@testing-library/jest-dom'],
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
-    '^.+\\.(ts|tsx)$': 'ts-jest',
   },
-  transformIgnorePatterns: [
-    'node_modules/(?!(jest-)?react|react-native|@react-native-community|@expo)',
-  ],
+  transformIgnorePatterns: ['/node_modules/(?!(@testing-library/react)/)'],
   moduleNameMapper: {
-    '^react-native$': 'react-native-web',
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
+  testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
 }

@@ -35,6 +35,7 @@ const CartItem = ({ product, onAddToCart, disabled }) => {
           onClick={handleAddToCart}
           IconComponent={PlusCircledIcon}
           disabled={disabled}
+          variant="outline"
         />
       </CardFooter>
     </Card>

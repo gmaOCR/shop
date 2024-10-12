@@ -26,6 +26,9 @@ coverage = "*"
 pytest-cov = "*"
 
 [dev-packages]
+django-extensions = "*"
+pygraphviz = "*"
+django-schema-graph = "*"
 
 [requires]
 python_version = "3.11"

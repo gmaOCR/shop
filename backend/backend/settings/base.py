@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'api',
     'cart.apps.CartConfig',
-    'order',
+    'delivery',
     'product',
     'user',
     'phonenumber_field',

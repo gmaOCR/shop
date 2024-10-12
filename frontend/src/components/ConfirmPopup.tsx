@@ -6,29 +6,39 @@ import {
   DialogTrigger,
   DialogHeader,
   DialogDescription,
+  DialogTitle,
 } from '@/components/ui/dialog'
 import CustomButton from './CustomButton'
 import { TrashIcon } from '@radix-ui/react-icons'
 
 interface ConfirmPopupProps {
-  open: boolean
-  onClose: () => void
   onConfirm: () => void
-  itemId: number
-  itemName: string
+  itemId?: number
+  textUser: string
+  triggerIcon?: React.ComponentType<React.SVGProps<SVGSVGElement>>
+  textButton?: string
 }
 
-const ConfirmPopup: React.FC<ConfirmPopupProps> = ({ onConfirm, itemName }) => {
+const ConfirmPopup: React.FC<ConfirmPopupProps> = ({
+  onConfirm,
+  textUser,
+  triggerIcon = TrashIcon,
+  textButton,
+}) => {
   return (
     <Dialog>
-      <DialogTrigger>
-        <CustomButton variant="outline" IconComponent={TrashIcon} />
+      <DialogTrigger asChild>
+        {textButton ? (
+          <CustomButton variant="outline" texte={textButton} />
+        ) : (
+          <CustomButton variant="outline" IconComponent={triggerIcon} />
+        )}
       </DialogTrigger>
       <DialogContent>
-        <DialogHeader>Supprimer l'item</DialogHeader>
-        <DialogDescription>
-          Êtes-vous sûr de vouloir supprimer l'item {itemName} de votre panier ?
-        </DialogDescription>
+        <DialogHeader>
+          <DialogTitle>Supprimer l'élément</DialogTitle>
+        </DialogHeader>
+        <DialogDescription>{textUser}</DialogDescription>
         <DialogFooter>
           <CustomButton
             onClick={onConfirm}
