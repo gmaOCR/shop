@@ -26,6 +26,10 @@ function Cart({ cart, saveCart }) {
     return Number(price).toFixed(2)
   }
 
+  const handleCheckout = () => {
+    navigate('/checkout', { state: { cart } })
+  }
+
   const handleIncrementQuantity = (itemId) => {
     const updatedCart = { ...cart }
     const itemIndex = updatedCart.items.findIndex(
@@ -63,11 +67,6 @@ function Cart({ cart, saveCart }) {
       <div className="p-4">
         <div className="flex gap-2 items-center mb-4">
           <h2 className="text-xl font-bold">Votre panier</h2>
-          {/* <CustomButton
-            onClick={handleClearCart}
-            className="mt-4"
-            texte="Vider le panier"
-          ></CustomButton> */}
           <ConfirmPopup
             open={false}
             onConfirm={() => handleClearCart()}
@@ -123,6 +122,14 @@ function Cart({ cart, saveCart }) {
               <span className="font-bold text-lg">
                 Total: {calculateTotal()} €
               </span>
+            </div>
+            <div className="text-right">
+              <CustomButton
+                onClick={handleCheckout}
+                className="bg-green-500 text-white px-4 py-2 rounded"
+              >
+                Valider le panier
+              </CustomButton>
             </div>
           </div>
         ) : (
