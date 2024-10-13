@@ -24,6 +24,8 @@ django-celery-results = "*"
 pprintpp = "*"
 coverage = "*"
 pytest-cov = "*"
+django-oscar-api = "*"
+django-oscar = {extras = ["sorl-thumbnail"], version = "*"}
 
 [dev-packages]
 django-extensions = "*"

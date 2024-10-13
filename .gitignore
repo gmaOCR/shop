@@ -20,3 +20,4 @@ backend/all_models.png
 .gitignore
 *coverage*
 UsersStories.ods
+backend/db copy.sqlite3

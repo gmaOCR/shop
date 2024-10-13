@@ -1,15 +1,15 @@
 from django.db import models
 from product.models import Product
-from user.models import CustomUser
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
+from django.conf import settings
 import uuid
 
 
 class Cart(models.Model):
     user = models.OneToOneField(
-        CustomUser, on_delete=models.CASCADE, null=True, blank=True)
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     session_id = models.CharField(
