@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = 'django-insecure-l2u8+ag^5)l&61$2j5s*al%x4$0wk#9gw(@)y@!0od84r+-gy!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -30,10 +30,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'api',
-    'cart.apps.CartConfig',
-    'delivery',
-    'product',
-    # 'user',
     'phonenumber_field',
     'django_celery_results',
 
@@ -103,6 +99,7 @@ SIMPLE_JWT = {
 }
 
 MIDDLEWARE = [
+    # 'oscarapi.middleware.ApiGatewayMiddleWare',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -111,7 +108,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'oscar.apps.basket.middleware.BasketMiddleware',
+    # "oscarapi.middleware.ApiBasketMiddleWare",
+    "oscarapi.middleware.HeaderSessionMiddleware",
+    # 'oscar.apps.basket.middleware.BasketMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
 ]
 
@@ -184,7 +183,7 @@ PHONENUMBER_DB_FORMAT = "E164"
 PHONENUMBER_DEFAULT_FORMAT = "E164"
 PHONENUMBER_DEFAULT_REGION = "FR"
 
-SESSION_COOKIE_NAME = 'session_id'
+SESSION_COOKIE_NAME = 'sessionid'
 SESSION_COOKIE_AGE = 60 * 60
 
 # SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
@@ -196,6 +195,65 @@ AUTHENTICATION_BACKENDS = (
 
 HAYSTACK_CONNECTIONS = {
     'default': {
-        'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://127.0.0.1:8983/solr',
+        'INCLUDE_SPELLING': True,
     },
 }
+
+
+OSCARAPI_BLOCK_ADMIN_API_ACCESS = False
+
+OSCAR_INITIAL_ORDER_STATUS = 'Pending'
+OSCAR_INITIAL_LINE_STATUS = 'Pending'
+OSCAR_ORDER_STATUS_PIPELINE = {
+    'Pending': ('Being processed', 'Cancelled',),
+    'Being processed': ('Processed', 'Cancelled',),
+    'Cancelled': (),
+}
+
+
+OSCARAPI_ENABLE_REGISTRATION = True
+
+
+OSCAR_ALLOW_ANON_CHECKOUT = True
+
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+]
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+    'HEAD',
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'x-oscar-api-session',
+    'SessionId',
+    "Session-Label",
+    "Oscar-API-Version",
+    "Set-Cookie",
+    "x-session-id",
+    "Session-Id",
+    "Cookie",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+# OSCAR_BASKET_COOKIE_LIFETIME = 604800
+# OSCAR_API_HEADER_SESSION_ID = 'Session-Id'
+# OSCAR_API_HEADER_VERSION = 'Oscar-API-Version'

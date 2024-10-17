@@ -1,6 +1,20 @@
 from .base import *
 from datetime import timedelta
 from oscar.defaults import *
+from decouple import config
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='5432'),
+    }
+}
+
 
 DEBUG = True
 
@@ -9,17 +23,19 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=90),
 }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'db.sqlite3',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
-        'ATOMIC_REQUESTS': True,
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': 'db.sqlite3',
+#         'USER': '',
+#         'PASSWORD': '',
+#         'HOST': '',
+#         'PORT': '',
+#         'ATOMIC_REQUESTS': True,
+#         "TIMEOUT": 30,
+#     }
+# }
+
 
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -28,8 +44,7 @@ STATIC_URL = '/static/'
 # Utiliser le backend de session par défaut (base de données)
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
-# Durée de vie de la session (2 semaines)
-SESSION_COOKIE_AGE = 1209600
+SESSION_COOKIE_AGE = 6000
 
 # Désactiver le flag 'secure' pour permettre l'utilisation en HTTP
 SESSION_COOKIE_SECURE = False
@@ -40,5 +55,12 @@ SESSION_COOKIE_HTTPONLY = False
 # Désactiver SameSite pour faciliter le développement local
 SESSION_COOKIE_SAMESITE = None
 
+OSCAR_BASKET_COOKIE_LIFETIME = 10
 
 INSTALLED_APPS += ['django_extensions', 'schema_graph',]
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+print("-------------------------"
+      "Developement config LOADED"
+      "-------------------------")
