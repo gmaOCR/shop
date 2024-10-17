@@ -1,6 +1,6 @@
 import React from 'react'
 import CustomButton from './CustomButton'
-import { Cross2Icon, PlusIcon, MinusIcon } from '@radix-ui/react-icons'
+import { PlusIcon, MinusIcon } from '@radix-ui/react-icons'
 import ConfirmPopup from './ConfirmPopup'
 
 function Cart({ cart, saveCart }) {

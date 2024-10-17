@@ -1,41 +1,43 @@
-// App.js
-import React from 'react'
+import React, { useEffect } from 'react'
 import Menu from '@/components/Menu'
-import ItemList from '@/components/ItemsList'
+import Items from '@/components/Items'
 import Cart from '@/components/Cart'
-import useAnonymousCart from '@/components/hooks/useAnonymousCart'
-
-// For dev only
-// localStorage.clear()
+import Login from '@/components/Login'
+import { useCartContext } from '@/components/CartContext'
+import { useProducts } from '@/components/hooks/useProducts'
 
 function App() {
-  const { cart, loading, error, saveCart } = useAnonymousCart()
+  const { cart, handleUpdateCart } = useCartContext()
+  const { data: products, loading, error, getProducts } = useProducts()
 
-  const handleUpdateCart = (newCart) => {
-    saveCart(newCart)
-  }
-
-  const disableRightClick = (event) => {
-    event.preventDefault()
-  }
+  useEffect(() => {
+    getProducts()
+  }, [getProducts])
 
   if (loading) {
     return <div>Chargement...</div>
   }
 
   if (error) {
-    return <div>Erreur: {error}</div>
+    return <div>Erreur : {error.message}</div>
   }
 
   return (
     <div className="px-[10%]">
       <Menu />
-      <ItemList
-        disableRightClick={disableRightClick}
-        saveCart={handleUpdateCart}
-        cart={cart}
-      />
-      <Cart cart={cart} saveCart={handleUpdateCart} />
+      <hr />
+      {products.map((product) => (
+        <Items
+          key={product.id}
+          product={product}
+          onAddToCart={handleUpdateCart}
+          disabled={false}
+        />
+      ))}
+      <hr />
+      <Cart cart={cart} />
+      <hr />
+      <Login />
     </div>
   )
 }
