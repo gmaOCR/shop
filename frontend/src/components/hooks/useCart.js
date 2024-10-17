@@ -1,10 +1,10 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 
 const useCart = () => {
   const [cart, setCart] = useState(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [isFetching, setIsFetching] = useState(false)
+  const isFetchingRef = useRef(false)
 
   const generateRandomIdentifier = () => {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
@@ -34,10 +34,11 @@ const useCart = () => {
   }
 
   const fetchCart = useCallback(() => {
-    console.debug('fetchCart called')
-    if (isFetching) return
-    setIsFetching(true)
+    if (isFetchingRef.current) return
+
+    isFetchingRef.current = true
     setLoading(true)
+
     const sessionId = getSessionId()
     fetch('http://localhost:8000/api/basket/', {
       method: 'GET',
@@ -47,7 +48,6 @@ const useCart = () => {
       },
     })
       .then((response) => {
-        console.debug('Response:', response)
         if (!response.ok) {
           throw new Error('Network response was not ok')
         }
@@ -55,56 +55,51 @@ const useCart = () => {
       })
       .then((data) => {
         setCart(data)
-        console.debug('Cart data:', data)
       })
-      .catch((error) => setError(error))
+      .catch((error) => {
+        setError(error)
+      })
       .finally(() => {
         setLoading(false)
-        setIsFetching(false)
+        isFetchingRef.current = false
       })
   }, [])
 
-  const updateCart = useCallback(
-    (product, quantity) => {
-      if (isFetching) return
-      setIsFetching(true)
-      setLoading(true)
+  const updateCart = useCallback((product, quantity) => {
+    if (isFetchingRef.current) return
+    isFetchingRef.current = true
+    setLoading(true)
 
-      const sessionId = getSessionId()
+    const sessionId = getSessionId()
+    const productUrl = `http://localhost:8000/api/products/${product.id}/`
 
-      const productUrl = `http://localhost:8000/api/products/${product.id}/`
+    const requestBody = {
+      url: productUrl,
+      quantity: quantity,
+    }
 
-      const requestBody = {
-        url: productUrl,
-        quantity: quantity,
-      }
-
-      console.debug('Sending request with:', requestBody)
-
-      fetch(`http://localhost:8000/api/basket/add-product/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': '*/*',
-          'Cookie': `sessionid=${sessionId}`,
-        },
-        body: JSON.stringify(requestBody),
+    fetch(`http://localhost:8000/api/basket/add-product/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': '*/*',
+        'Cookie': `sessionid=${sessionId}`,
+      },
+      body: JSON.stringify(requestBody),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok')
+        }
+        return response.json()
       })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok')
-          }
-          return response.json()
-        })
-        .then((data) => setCart(data))
-        .catch((error) => setError(error))
-        .finally(() => {
-          setLoading(false)
-          setIsFetching(false)
-        })
-    },
-    [isFetching],
-  )
+      .then((data) => setCart(data))
+      .catch((error) => setError(error))
+      .finally(() => {
+        setLoading(false)
+        isFetchingRef.current = false
+      })
+  }, [])
 
   return { cart, error, loading, updateCart, fetchCart }
 }

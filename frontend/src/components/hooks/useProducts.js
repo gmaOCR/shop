@@ -95,5 +95,6 @@ export const useProducts = () => {
     getProducts,
     updateProduct,
     deleteProduct,
+    fetchProductDetails,
   }
 }
