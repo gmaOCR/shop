@@ -10,7 +10,7 @@ requests = "*"
 psutil = "*"
 pillow = "*"
 djangorestframework-simplejwt = "*"
-django-phonenumber-field = {extras = ["phonenumberslite"], version = "*"}
+django-phonenumber-field = {extras = ["phonenumberslite"] }
 django-cors-headers = "*"
 drf-excel = "*"
 openpyxl = "*"
@@ -25,7 +25,11 @@ pprintpp = "*"
 coverage = "*"
 pytest-cov = "*"
 django-oscar-api = "*"
-django-oscar = {extras = ["sorl-thumbnail"], version = "*"}
+django-oscar = {extras = ["sorl-thumbnail"] }
+pycountry = "*"
+pysolr = "*"
+python-decouple = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 django-extensions = "*"

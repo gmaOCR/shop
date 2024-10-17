@@ -2,7 +2,6 @@
 
 # Se placer à la racine du projet
 cd "$(dirname "$0")"/..
-
 echo "Current directory: $(pwd)"
 echo "Python path: $PYTHONPATH"
 

@@ -1,15 +1,19 @@
+from django import setup
+from celery import Celery
+from celery.schedules import crontab
 from django.conf import settings
 import os
-from celery.schedules import crontab
-from backend.settings.base import DEBUG
-from celery import Celery
-if DEBUG:
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings.dev')
-else:
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings.prod')
+from dotenv import load_dotenv
 
-from django import setup
-setup()
+# load_dotenv()
+# DEBUG = os.getenv('DEBUG', False)
+
+# if DEBUG:
+#     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings.dev')
+# else:
+#     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings.prod')
+
+# setup()
 
 
 app = Celery('backend')
