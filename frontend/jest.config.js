@@ -9,4 +9,5 @@ export default {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
+  setupFiles: ['whatwg-fetch'],
 }
