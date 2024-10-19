@@ -59,6 +59,21 @@ OSCAR_BASKET_COOKIE_LIFETIME = 10
 
 INSTALLED_APPS += ['django_extensions', 'schema_graph',]
 
+MIDDLEWARE += ['backend.middleware.DebugMiddleware',]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES':
+        ('rest_framework.authentication.BasicAuthentication',
+         'rest_framework_simplejwt.authentication.JWTAuthentication',
+         'rest_framework.authentication.SessionAuthentication',),
+    'DEFAULT_PERMISSION_CLASSES': [],
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+        'drf_excel.renderers.XLSXRenderer',
+    ),
+}
+
 CORS_ORIGIN_ALLOW_ALL = True
 
 print("-------------------------"

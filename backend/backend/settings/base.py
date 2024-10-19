@@ -98,8 +98,8 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
+
 MIDDLEWARE = [
-    # 'oscarapi.middleware.ApiGatewayMiddleWare',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -108,9 +108,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # "oscarapi.middleware.ApiBasketMiddleWare",
     "oscarapi.middleware.HeaderSessionMiddleware",
-    # 'oscar.apps.basket.middleware.BasketMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
 ]
 
@@ -186,8 +184,6 @@ PHONENUMBER_DEFAULT_REGION = "FR"
 SESSION_COOKIE_NAME = 'sessionid'
 SESSION_COOKIE_AGE = 60 * 60
 
-# SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
-
 AUTHENTICATION_BACKENDS = (
     'oscar.apps.customer.auth_backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
@@ -254,6 +250,3 @@ CORS_ALLOW_HEADERS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
-# OSCAR_BASKET_COOKIE_LIFETIME = 604800
-# OSCAR_API_HEADER_SESSION_ID = 'Session-Id'
-# OSCAR_API_HEADER_VERSION = 'Oscar-API-Version'
