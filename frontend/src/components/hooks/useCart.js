@@ -83,7 +83,7 @@ const useCart = () => {
       headers: {
         'Content-Type': 'application/json',
         'Accept': '*/*',
-        'Cookie': `sessionid=${sessionId}`,
+        'Session-Id': sessionId,
       },
       body: JSON.stringify(requestBody),
     })
@@ -101,7 +101,7 @@ const useCart = () => {
       })
   }, [])
 
-  return { cart, error, loading, updateCart, fetchCart }
+  return { cart, error, loading, updateCart, fetchCart, getSessionId }
 }
 
 export default useCart
