@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react'
 import Menu from '@/components/Menu'
-import Items from '@/components/Items'
+import ProductCard from '@/components/ProductCard'
 import Cart from '@/components/Cart'
 import Login from '@/components/Login'
-import { useCartContext } from '@/components/CartContext'
+import { useCartContext } from '@/components/context/CartContext'
 import { useProducts } from '@/components/hooks/useProducts'
 
 function App() {
@@ -27,12 +27,7 @@ function App() {
       <Menu />
       <hr />
       {products.map((product) => (
-        <Items
-          key={product.id}
-          product={product}
-          onAddToCart={handleUpdateCart}
-          disabled={false}
-        />
+        <ProductCard key={product.id} product={product} disabled={false} />
       ))}
       <hr />
       <Cart cart={cart} />
