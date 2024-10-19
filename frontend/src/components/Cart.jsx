@@ -1,127 +1,82 @@
 import React from 'react'
 import CustomButton from './CustomButton'
-import { PlusIcon, MinusIcon } from '@radix-ui/react-icons'
 import ConfirmPopup from './ConfirmPopup'
+import CartItemLine from './CartItemLine'
+import { useCartContext } from './context/CartContext'
 
-function Cart({ cart, saveCart }) {
-  if (!cart || !cart.items || cart.items.length === 0) {
-    return <div>Votre panier est vide</div>
+function Cart() {
+  const {
+    cart,
+    lines,
+    loading,
+    error,
+    total,
+    updateLineQuantity,
+    deleteLine,
+    updateCart,
+  } = useCartContext()
+
+  if (loading) {
+    return (
+      <div>
+        {cart ? <div>Cart ID: {cart?.id}</div> : <div>No cart available</div>}
+        Chargement des lignes...
+      </div>
+    )
   }
-  console.debug('Cart:', cart)
+
+  if (error) {
+    return (
+      <div>
+        Une erreur s'est produite lors de la récupération des lignes du panier.
+      </div>
+    )
+  }
+
+  if (!cart || !cart.id) {
+    return <div>Panier non présent</div>
+  }
+
+  if (!lines || lines.length === 0) {
+    return <div>Cart ID: {cart?.id} Votre panier est vide</div>
+  }
 
   const handleClearCart = () => {
-    saveCart({ ...cart, items: [] })
-  }
-
-  const calculateTotal = () => {
-    return cart.items
-      .reduce(
-        (total, item) => total + Number(item.product.price) * item.quantity,
-        0,
-      )
-      .toFixed(2)
-  }
-
-  const formatPrice = (price) => {
-    return Number(price).toFixed(2)
+    updateCart({ ...cart, lines: [] })
   }
 
   const handleCheckout = () => {
-    navigate('/checkout', { state: { cart } })
+    // Logique pour le checkout
+    console.debug('Checkout initiated')
   }
 
-  const handleIncrementQuantity = (itemId) => {
-    const updatedCart = { ...cart }
-    const itemIndex = updatedCart.items.findIndex(
-      (item) => item.product.id === itemId,
-    )
-    if (itemIndex !== -1) {
-      updatedCart.items[itemIndex].quantity += 1
-      saveCart(updatedCart)
-    }
-  }
-
-  const handleDecrementQuantity = (itemId) => {
-    const updatedCart = { ...cart }
-    const itemIndex = updatedCart.items.findIndex(
-      (item) => item.product.id === itemId,
-    )
-    if (itemIndex !== -1 && updatedCart.items[itemIndex].quantity > 1) {
-      updatedCart.items[itemIndex].quantity -= 1
-      saveCart(updatedCart)
-    }
-  }
-
-  const handleDeleteItem = (itemId) => {
-    const updatedCart = { ...cart }
-    const itemIndex = updatedCart.items.findIndex(
-      (item) => item.product.id === itemId,
-    )
-    if (itemIndex !== -1) {
-      updatedCart.items.splice(itemIndex, 1)
-      saveCart(updatedCart)
-    }
-  }
   try {
     return (
       <div className="p-4">
+        Cart id: {cart.id}
         <div className="flex gap-2 items-center mb-4">
           <h2 className="text-xl font-bold">Votre panier</h2>
           <ConfirmPopup
             open={false}
-            onConfirm={() => handleClearCart()}
+            onConfirm={handleClearCart}
             textUser={`Êtes-vous sûr de vouloir supprimer votre panier ?`}
             textButton="Vider le panier"
-          ></ConfirmPopup>
+          />
         </div>
-        {cart.session_id && (
-          <p className="mb-2">Session ID: {cart.session_id}</p>
-        )}
-
-        {cart.items && cart.items.length > 0 ? (
+        {lines.length > 0 ? (
           <div>
             <ul className="mb-4">
-              {cart.items.map((item) => (
-                <li
-                  key={item.product.id}
-                  className="mb-2 flex justify-between items-center"
-                >
-                  <ConfirmPopup
-                    open={false}
-                    onConfirm={() => handleDeleteItem(item.product.id)}
-                    itemId={item.product.id}
-                    textUser={`Êtes-vous sûr de vouloir supprimer l'item ${item.product.name} de votre panier ?`}
-                  ></ConfirmPopup>
-                  <div>
-                    <span className="font-semibold">{item.product.name}</span> -
-                    P.u.: {formatPrice(item.product.price)}€ - Quantité:{' '}
-                    {item.quantity}
-                  </div>
-                  <div className="flex items-center">
-                    <CustomButton
-                      onClick={() => handleDecrementQuantity(item.product.id)}
-                      IconComponent={MinusIcon}
-                      className="mr-2"
-                      variant="outline"
-                    />
-                    <CustomButton
-                      onClick={() => handleIncrementQuantity(item.product.id)}
-                      IconComponent={PlusIcon}
-                      className="ml-2"
-                      variant="outline_grey"
-                    />
-                    <span className="font-bold ml-4">
-                      {formatPrice(Number(item.product.price) * item.quantity)}{' '}
-                      €
-                    </span>
-                  </div>
-                </li>
+              {lines.map((line) => (
+                <CartItemLine
+                  key={line.url}
+                  line={line}
+                  onUpdateQuantity={updateLineQuantity}
+                  onRemove={deleteLine}
+                />
               ))}
             </ul>
             <div className="text-right mb-4">
-              <span className="font-bold text-lg">
-                Total: {calculateTotal()} €
-              </span>
+              <span className="font-bold text-lg">Total: {total} €</span>
             </div>
             <div className="text-right">
               <CustomButton
