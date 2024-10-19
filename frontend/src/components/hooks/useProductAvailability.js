@@ -12,7 +12,6 @@ export const useProductAvailability = () => {
       const response = await fetch(availabilityUrl, { method: 'GET' })
       const data = await response.json()
 
-      // Assuming data has the structure you provided
       setAvailability({
         isAvailable: data.is_available_to_buy,
         message: data.message,
