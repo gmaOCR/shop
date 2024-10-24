@@ -15,10 +15,9 @@ import { useProductAvailability } from './hooks/useProductAvailability'
 import { useCartContext } from './context/CartContext'
 
 const ProductCard = ({ product }) => {
-  const { fetchPrice, price } = useProductPrice()
+  const { fetchPrice, price, currency } = useProductPrice()
   const { fetchAvailability, availability } = useProductAvailability()
-  const { cart, updateCart } = useCartContext()
-  const [isAdding, setIsAdding] = useState(false)
+  const { updateCart, lines } = useCartContext()
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -27,17 +26,24 @@ const ProductCard = ({ product }) => {
     }
 
     fetchDetails()
-  }, [])
+  }, [product.id])
 
   const handleAddToCart = async () => {
-    setIsAdding(true)
     try {
       await updateCart(product, 1)
     } catch (error) {
       console.error("Erreur lors de l'ajout au panier:", error)
-    } finally {
-      setIsAdding(false)
     }
+  }
+
+  const isInCart = lines.some((item) => {
+    const itemProductId = item.product.split('/').slice(-2, -1)[0]
+
+    return itemProductId === product.id.toString()
+  })
+
+  if (!product) {
+    return <div>Produit non disponible</div>
   }
 
   return (
@@ -57,15 +63,18 @@ const ProductCard = ({ product }) => {
         {availability ? (
           availability.isAvailable ? (
             <>
-              <p>Price: {price}€</p>
+              <p>
+                Price: {price}
+                <span> {currency}</span>
+              </p>
               <p>{availability.message}</p>
+
               <CustomButton
                 onClick={handleAddToCart}
                 IconComponent={PlusCircledIcon}
-                disabled={isAdding}
+                disabled={isInCart}
                 variant={'outline'}
               />
-              {isAdding ? 'Ajout en cours...' : ''}
             </>
           ) : (
             <p>Unavailable</p>
