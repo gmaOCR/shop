@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import CustomButton from './CustomButton'
 import { MinusIcon, PlusIcon, TrashIcon } from '@radix-ui/react-icons'
@@ -28,25 +28,47 @@ const CartItemLine = ({
     queryFn: () => fetchStockRecord(productId, stockrecordId),
   })
 
+  const [loading, setLoading] = useState(false)
+  const debounceTimeoutRef = useRef(null)
+
   if (!product || stockLoading) {
     return <div>Loading...</div>
   }
 
   const handleUpdateQuantity = async (newQuantity) => {
-    if (propOnUpdateQuantity) {
-      await propOnUpdateQuantity(line.url, newQuantity)
-    } else {
-      await contextUpdateLineQuantity(line.url, newQuantity)
-      fetchCart()
+    setLoading(true)
+    try {
+      if (propOnUpdateQuantity) {
+        await propOnUpdateQuantity(line.url, newQuantity)
+      } else {
+        await contextUpdateLineQuantity(line.url, newQuantity)
+        fetchCart()
+      }
+    } finally {
+      setLoading(false)
     }
   }
 
+  const handleDebouncedUpdateQuantity = (newQuantity) => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current)
+    }
+    debounceTimeoutRef.current = setTimeout(() => {
+      handleUpdateQuantity(newQuantity)
+    }, 150)
+  }
+
   const handleRemove = async () => {
-    if (propOnRemove) {
-      await propOnRemove(line.url)
-    } else {
-      await contextDeleteLine(line.url)
-      fetchCart()
+    setLoading(true)
+    try {
+      if (propOnRemove) {
+        await propOnRemove(line.url)
+      } else {
+        await contextDeleteLine(line.url)
+        fetchCart()
+      }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -55,28 +77,29 @@ const CartItemLine = ({
       line.quantity <
       stockrecord?.num_in_stock - stockrecord?.num_allocated
     ) {
-      handleUpdateQuantity(line.quantity + 1)
+      handleDebouncedUpdateQuantity(line.quantity + 1)
     }
   }
 
   const handleDecrement = () => {
     if (line.quantity > 1) {
-      handleUpdateQuantity(line.quantity - 1)
+      handleDebouncedUpdateQuantity(line.quantity - 1)
     }
   }
+
   return (
     <div className="flex justify-between items-center p-4 border-b">
       <div className="flex-grow">
         <h3 className="font-bold">{product?.title}</h3>
         <p>
-          P.u. {stockrecord.price} {line.price_currency}
+          P.u. {line.price_currency} {stockrecord.price}
         </p>
       </div>
       <div className="flex items-center space-x-2">
         <CustomButton
           onClick={handleDecrement}
           IconComponent={MinusIcon}
-          disabled={line.quantity <= 1}
+          disabled={loading || line.quantity <= 1}
           variant="outline"
         />
         <span>{line.quantity}</span>
@@ -84,13 +107,14 @@ const CartItemLine = ({
           onClick={handleIncrement}
           IconComponent={PlusIcon}
           disabled={
+            loading ||
             line.quantity >=
-            stockrecord?.num_in_stock - stockrecord?.num_allocated
+              stockrecord?.num_in_stock - stockrecord?.num_allocated
           }
           variant="outline"
         />
         <p className="w-[100px]">
-          {line.price_incl_tax} {line.price_currency}
+          {line.price_currency} {line.price_incl_tax}
         </p>
         <CustomButton
           onClick={handleRemove}
