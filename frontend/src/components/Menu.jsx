@@ -23,8 +23,15 @@ const Menu = () => (
           </NavigationMenuLink>
           <NavigationMenuLink
             className={`${navigationMenuTriggerStyle()} py-3 mx-3`}
+            href="/login"
           >
-            Panier
+            Login
+          </NavigationMenuLink>
+          <NavigationMenuLink
+            className={`${navigationMenuTriggerStyle()} py-3 mx-3`}
+            href="/checkout"
+          >
+            Checkout
           </NavigationMenuLink>
         </NavigationMenuContent>
       </NavigationMenuItem>
