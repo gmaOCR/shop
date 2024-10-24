@@ -9,7 +9,8 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     path("api/", include("oscarapi.urls")),
-    path("api/", include("api.urls"))
+    path("api/", include("api.urls")),
+    # path('dashboard/', include('oscar.apps.dashboard.urls'))
 ]
 
 if settings.DEBUG:

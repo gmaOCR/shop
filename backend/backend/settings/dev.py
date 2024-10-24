@@ -23,19 +23,6 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=90),
 }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': 'db.sqlite3',
-#         'USER': '',
-#         'PASSWORD': '',
-#         'HOST': '',
-#         'PORT': '',
-#         'ATOMIC_REQUESTS': True,
-#         "TIMEOUT": 30,
-#     }
-# }
-
 
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -71,7 +58,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
         'drf_excel.renderers.XLSXRenderer',
-    ),
+            ),
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -79,3 +66,10 @@ CORS_ORIGIN_ALLOW_ALL = True
 print("-------------------------"
       "Developement config LOADED"
       "-------------------------")
+
+
+SHIPPING_METHODS = [
+    'backend.shipping.custom_shipping_methods.MyShippingMethod',
+]
+
+OSCAR_ALLOW_ANON_CHECKOUT = True

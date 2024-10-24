@@ -40,7 +40,10 @@ INSTALLED_APPS = [
     'oscar.apps.analytics.apps.AnalyticsConfig',
     'oscar.apps.checkout.apps.CheckoutConfig',
     'oscar.apps.address.apps.AddressConfig',
-    'oscar.apps.shipping.apps.ShippingConfig',
+
+    # 'oscar.apps.shipping.apps.ShippingConfig',
+    'shipping.apps.ShippingConfig',
+
     'oscar.apps.catalogue.apps.CatalogueConfig',
     'oscar.apps.catalogue.reviews.apps.CatalogueReviewsConfig',
     'oscar.apps.communication.apps.CommunicationConfig',
@@ -87,7 +90,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
         'drf_excel.renderers.XLSXRenderer',
-        ),
+    ),
 }
 
 
@@ -210,9 +213,6 @@ OSCAR_ORDER_STATUS_PIPELINE = {
 
 
 OSCARAPI_ENABLE_REGISTRATION = True
-
-
-OSCAR_ALLOW_ANON_CHECKOUT = True
 
 
 CORS_ALLOWED_ORIGINS = [

@@ -1,27 +1,31 @@
-class DebugMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
+from django.conf import settings
 
-    def __call__(self, request):
-        print(f"Session ID: {request.session.session_key}")
-        print(f"User: {request.user}")
+if settings.DEBUG:
 
-        # Vérifiez si l'authentification DRF est utilisée
-        if hasattr(request, 'auth'):
-            print(f"Auth: {request.auth}")
-        else:
-            print("Auth: Not available")
+    class DebugMiddleware:
+        def __init__(self, get_response):
+            self.get_response = get_response
 
-        # Informations supplémentaires utiles
-        print(f"Method: {request.method}")
-        print(f"Path: {request.path}")
-        print(f"GET params: {request.GET}")
-        print(f"POST params: {request.POST}")
-        print(f"Headers: {request.headers}")
+        def __call__(self, request):
+            print(f"Session ID: {request.session.session_key}")
+            print(f"User: {request.user}")
 
-        response = self.get_response(request)
+            # Vérifiez si l'authentification DRF est utilisée
+            if hasattr(request, 'auth'):
+                print(f"Auth: {request.auth}")
+            else:
+                print("Auth: Not available")
 
-        # Informations sur la réponse
-        print(f"Response status: {response.status_code}")
+            # Informations supplémentaires utiles
+            print(f"Method: {request.method}")
+            print(f"Path: {request.path}")
+            print(f"GET params: {request.GET}")
+            print(f"POST params: {request.POST}")
+            print(f"Headers: {request.headers}")
 
-        return response
+            response = self.get_response(request)
+
+            # Informations sur la réponse
+            print(f"Response status: {response.status_code}")
+
+            return response
