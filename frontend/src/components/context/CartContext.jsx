@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import useCart from '../hooks/useCart'
 import useCartLines from '../hooks/useCartLines'
 
@@ -19,52 +19,43 @@ export const CartProvider = ({ children }) => {
     lines,
     loading: linesLoading,
     error: linesError,
+    linesLoaded,
     updateLineQuantity,
     deleteLine,
     fetchLines,
   } = useCartLines(cart, getSessionId)
 
-  const [total, setTotal] = useState(0)
+  const [fullLoading, setFullLoading] = useState(true)
 
   useEffect(() => {
     fetchCart()
-  }, [fetchCart])
+  }, [])
 
   useEffect(() => {
-    if (cart && cart.lines) {
+    if (cart?.id) {
       fetchLines()
     }
-  }, [cart?.id, fetchLines])
-
-  // useEffect(() => {
-  //   console.debug('CartContext - cart:', cart)
-  //   console.debug('CartContext - lines:', lines)
-  //   console.debug('CartContext - cartLoading:', cartLoading)
-  //   console.debug('CartContext - linesLoading:', linesLoading)
-  //   console.debug('CartContext - cartError:', cartError)
-  //   console.debug('CartContext - linesError:', linesError)
-  // }, [cart, lines, cartLoading, linesLoading, cartError, linesError])
+  }, [cart?.lines])
 
   useEffect(() => {
-    if (lines) {
-      const newTotal = lines.reduce(
-        (sum, line) => sum + line.price * line.quantity,
-        0,
-      )
-      setTotal(newTotal)
-    }
-  }, [lines])
+    setFullLoading(cartLoading || linesLoading || !linesLoaded)
+  }, [cartLoading, linesLoading, linesLoaded])
 
   return (
     <CartContext.Provider
       value={{
         cart,
         lines,
-        loading: cartLoading || linesLoading,
+        loading: {
+          cart: cartLoading,
+          lines: linesLoading,
+          linesLoaded,
+          full: fullLoading,
+        },
         error: cartError || linesError,
-        total,
         updateCart,
         fetchCart,
+        fetchLines,
         updateLineQuantity,
         deleteLine,
         getSessionId,

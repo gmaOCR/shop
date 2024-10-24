@@ -3,44 +3,47 @@ import { useEffect, useState, useCallback } from 'react'
 const useCartLines = (cart, getSessionId) => {
   const [lines, setLines] = useState([])
   const [loading, setLoading] = useState(true)
+  const [linesLoaded, setLinesLoaded] = useState(false)
   const [error, setError] = useState(null)
   const sessionId = getSessionId()
 
   const fetchLines = useCallback(async () => {
-    const fetchLines = async () => {
-      if (!cart || !cart.lines) {
-        setLines([])
-        setLoading(false)
-        return
-      }
-
-      try {
-        const response = await fetch(cart.lines, {
-          headers: {
-            'Session-Id': sessionId,
-          },
-        })
-
-        if (!response) {
-          throw new Error('Pas de réponse du serveur')
-        }
-
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`)
-        }
-
-        const data = await response.json()
-        setLines(data)
-      } catch (error) {
-        console.error('Erreur lors de la récupération des lignes:', error)
-        setError(error)
-        setLines([])
-      } finally {
-        setLoading(false)
-      }
+    if (!cart || !cart.lines) {
+      setLines([])
+      setLoading(false)
+      setLinesLoaded(false)
+      return
     }
 
-    fetchLines()
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch(cart.lines, {
+        headers: {
+          'Session-Id': sessionId,
+        },
+      })
+
+      if (!response) {
+        throw new Error('Pas de réponse du serveur')
+      }
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`)
+      }
+
+      const data = await response.json()
+      setLines(data)
+      setLinesLoaded(true)
+    } catch (error) {
+      console.error('Erreur lors de la récupération des lignes:', error)
+      setError(error)
+      setLines([])
+      setLinesLoaded(false)
+    } finally {
+      setLoading(false)
+    }
   }, [cart, sessionId])
 
   useEffect(() => {
@@ -113,7 +116,15 @@ const useCartLines = (cart, getSessionId) => {
     },
     [sessionId, lines],
   )
-  return { lines, loading, error, updateLineQuantity, deleteLine, fetchLines }
+  return {
+    lines,
+    loading,
+    error,
+    linesLoaded,
+    updateLineQuantity,
+    deleteLine,
+    fetchLines,
+  }
 }
 
 export default useCartLines
