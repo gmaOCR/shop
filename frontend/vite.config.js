@@ -17,13 +17,27 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8000',
+        target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
       },
     },
     build: {
       sourcemap: true,
+    },
+  },
+  // Ajout de la configuration de test
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.js',
+    include: ['src/**/*.{test,spec}.{js,jsx,ts,tsx}'],
+    coverage: {
+      reporter: ['text', 'json', 'html'],
+      exclude: ['node_modules/', 'src/test/setup.js'],
+    },
+    alias: {
+      '@': path.resolve(__dirname, './src'),
     },
   },
 })
