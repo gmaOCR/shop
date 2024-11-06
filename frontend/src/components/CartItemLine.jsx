@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react'
+// Version actuelle simplifiée et optimisée
+import React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import CustomButton from './CustomButton'
 import { MinusIcon, PlusIcon, TrashIcon } from '@radix-ui/react-icons'
@@ -6,19 +7,22 @@ import { fetchStockRecord } from '@/services/api'
 import { useProducts } from './context/ProductsContext'
 import { useCartContext } from './context/CartContext'
 
-const CartItemLine = ({
-  line,
-  onUpdateQuantity: propOnUpdateQuantity,
-  onRemove: propOnRemove,
-}) => {
-  const productId = line.product.split('/').filter(Boolean).pop()
-  const stockrecordId = line.stockrecord.split('/').filter(Boolean).pop()
+const CartItemLine = ({ line }) => {
+  const productId =
+    line.product && typeof line.product === 'string'
+      ? line.product.split('/').filter(Boolean).pop()
+      : null
+
+  const stockrecordId =
+    line.stockrecord && typeof line.stockrecord === 'string'
+      ? line.stockrecord.split('/').filter(Boolean).pop()
+      : null
 
   const { products } = useProducts()
   const {
-    updateLineQuantity: contextUpdateLineQuantity,
-    deleteLine: contextDeleteLine,
-    fetchCart,
+    updateLineQuantity,
+    deleteLine,
+    loading: { operation: operationLoading },
   } = useCartContext()
 
   const product = products.find((p) => p.id === parseInt(productId))
@@ -26,50 +30,11 @@ const CartItemLine = ({
   const { data: stockrecord, isLoading: stockLoading } = useQuery({
     queryKey: ['stockrecord', productId, stockrecordId],
     queryFn: () => fetchStockRecord(productId, stockrecordId),
+    enabled: !!productId && !!stockrecordId,
   })
 
-  const [loading, setLoading] = useState(false)
-  const debounceTimeoutRef = useRef(null)
-
-  if (!product || stockLoading) {
+  if (!line || stockLoading) {
     return <div>Loading...</div>
-  }
-
-  const handleUpdateQuantity = async (newQuantity) => {
-    setLoading(true)
-    try {
-      if (propOnUpdateQuantity) {
-        await propOnUpdateQuantity(line.url, newQuantity)
-      } else {
-        await contextUpdateLineQuantity(line.url, newQuantity)
-        fetchCart()
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleDebouncedUpdateQuantity = (newQuantity) => {
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current)
-    }
-    debounceTimeoutRef.current = setTimeout(() => {
-      handleUpdateQuantity(newQuantity)
-    }, 150)
-  }
-
-  const handleRemove = async () => {
-    setLoading(true)
-    try {
-      if (propOnRemove) {
-        await propOnRemove(line.url)
-      } else {
-        await contextDeleteLine(line.url)
-        fetchCart()
-      }
-    } finally {
-      setLoading(false)
-    }
   }
 
   const handleIncrement = () => {
@@ -77,13 +42,13 @@ const CartItemLine = ({
       line.quantity <
       stockrecord?.num_in_stock - stockrecord?.num_allocated
     ) {
-      handleDebouncedUpdateQuantity(line.quantity + 1)
+      updateLineQuantity(line.url, line.quantity + 1)
     }
   }
 
   const handleDecrement = () => {
     if (line.quantity > 1) {
-      handleDebouncedUpdateQuantity(line.quantity - 1)
+      updateLineQuantity(line.url, line.quantity - 1)
     }
   }
 
@@ -99,7 +64,7 @@ const CartItemLine = ({
         <CustomButton
           onClick={handleDecrement}
           IconComponent={MinusIcon}
-          disabled={loading || line.quantity <= 1}
+          disabled={operationLoading || line.quantity <= 1}
           variant="outline"
         />
         <span>{line.quantity}</span>
@@ -107,7 +72,7 @@ const CartItemLine = ({
           onClick={handleIncrement}
           IconComponent={PlusIcon}
           disabled={
-            loading ||
+            operationLoading ||
             line.quantity >=
               stockrecord?.num_in_stock - stockrecord?.num_allocated
           }
@@ -117,8 +82,9 @@ const CartItemLine = ({
           {line.price_currency} {line.price_incl_tax}
         </p>
         <CustomButton
-          onClick={handleRemove}
+          onClick={() => deleteLine(line.url)}
           IconComponent={TrashIcon}
+          disabled={operationLoading}
           variant="outline"
         />
       </div>

@@ -5,8 +5,16 @@ import { useProductStockRecords } from './useProductStockRecords'
 global.fetch = jest.fn()
 
 describe('useProductStockRecords', () => {
+  let consoleErrorSpy
+
   beforeEach(() => {
     jest.clearAllMocks()
+    // Créer un nouveau spy pour console.error avant chaque test
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore()
   })
 
   it('should initialize with default values', () => {

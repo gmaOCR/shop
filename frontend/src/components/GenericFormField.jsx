@@ -22,8 +22,10 @@ export const GenericFormField = ({
   type,
   options = [],
   onChange,
+  value,
 }) => {
   const { control } = useFormContext()
+  const id = `${name}-field`
 
   return (
     <FormField
@@ -31,38 +33,47 @@ export const GenericFormField = ({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
-          <FormControl>
-            {type === 'select' ? (
-              <Select
-                onValueChange={(value) => {
-                  field.onChange(value)
-                  onChange && onChange({ target: { name, value } })
-                }}
-                defaultValue={field.value}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {options.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            ) : (
-              <Input
-                {...field}
-                type={type}
-                onChange={(e) => {
-                  field.onChange(e)
-                  onChange && onChange(e)
-                }}
-              />
-            )}
-          </FormControl>
+          {type === 'select' ? (
+            <>
+              <FormLabel htmlFor={id}>{label}</FormLabel>
+              <FormControl>
+                <Select
+                  onValueChange={(value) => {
+                    field.onChange(value)
+                    onChange?.({ target: { name, value } })
+                  }}
+                  defaultValue={field.value}
+                  value={value}
+                  aria-labelledby={`${name}-label`}
+                >
+                  <SelectTrigger id={id}>
+                    <SelectValue placeholder="Sélectionner..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {options.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+            </>
+          ) : (
+            <>
+              <FormLabel>{label}</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  type={type}
+                  onChange={(e) => {
+                    field.onChange(e)
+                    onChange?.(e)
+                  }}
+                />
+              </FormControl>
+            </>
+          )}
           <FormMessage />
         </FormItem>
       )}

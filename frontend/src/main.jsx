@@ -6,6 +6,8 @@ import App from './App.jsx'
 import { CartProvider } from '@/components/context/CartContext'
 import { ProductProvider } from '@/components/context/ProductsContext.jsx'
 import './index.css'
+import '@radix-ui/themes/styles.css'
+import { Theme } from '@radix-ui/themes'
 
 const queryClient = new QueryClient()
 
@@ -14,7 +16,9 @@ createRoot(document.getElementById('root')).render(
     <QueryClientProvider client={queryClient}>
       <CartProvider>
         <ProductProvider>
-          <App />
+          <Theme>
+            <App />
+          </Theme>
         </ProductProvider>
       </CartProvider>
       <ReactQueryDevtools initialIsOpen={false} />

@@ -9,6 +9,17 @@ describe('useProductAvailability', () => {
     jest.clearAllMocks()
   })
 
+  let consoleErrorSpy
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore()
+  })
+
   it('should initialize with null availability, no loading, and no error', () => {
     const { result } = renderHook(() => useProductAvailability())
 

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CustomButton from './CustomButton'
 import ConfirmPopup from './ConfirmPopup'
@@ -10,17 +10,24 @@ function Cart() {
   const {
     cart,
     lines,
-    loading,
+    loading: { cart: cartLoading, lines: linesLoading, isLoading },
     error,
     updateLineQuantity,
     deleteLine,
-    updateCart,
+    clearCart,
+    fetchLines,
   } = useCartContext()
+
+  useEffect(() => {
+    if (cart?.id) {
+      fetchLines()
+    }
+  }, [cart, fetchLines])
 
   const navigate = useNavigate()
 
   const handleClearCart = () => {
-    updateCart({ ...cart, lines: [] })
+    clearCart()
   }
 
   const handleCheckout = () => {
@@ -35,7 +42,7 @@ function Cart() {
     )
   }
 
-  const isInitialLoading = loading && !cart
+  const isInitialLoading = cartLoading && !cart
 
   return (
     <div className="p-4">

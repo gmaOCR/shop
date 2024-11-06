@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { useCountries } from './hooks/useCountries'
-import { useShippingMethods } from './hooks/useShippingMethods'
+import { fetchCountries, fetchShippingMethods } from '../services/api'
 import { GenericFormField } from './GenericFormField'
 
 const formSchema = z.object({
@@ -34,9 +33,28 @@ const defaultValues = {
   phone_number: '',
 }
 
-export function ShippingAddress({ onSubmit }) {
-  const { countries } = useCountries()
-  const { shippingMethods } = useShippingMethods()
+const saveToLocalStorage = (key, data) => {
+  localStorage.setItem(key, JSON.stringify(data))
+}
+
+const getFromLocalStorage = (key) => {
+  const data = localStorage.getItem(key)
+  if (!data) return null
+
+  try {
+    const parsedData = JSON.parse(data)
+    return JSON.parse(data)
+  } catch (error) {
+    console.warn(`Non-JSON data found in localStorage for key "${key}":`, data)
+    return data
+  }
+}
+
+export function ShippingAddress({ onSubmit, onShippingChange }) {
+  const [countries, setCountries] = useState([])
+  const [shippingMethods, setShippingMethods] = useState([])
+  const [selectedShipping, setSelectedShipping] = useState('')
+  const [selectedCountry, setSelectedCountry] = useState('')
 
   const methods = useForm({
     resolver: zodResolver(formSchema),
@@ -44,30 +62,89 @@ export function ShippingAddress({ onSubmit }) {
     mode: 'onBlur',
   })
 
-  const { setValue, reset } = methods
+  const { setValue, reset, getValues } = methods
 
   useEffect(() => {
-    const savedData = localStorage.getItem('shippingFormData')
-    if (savedData) {
-      const parsedData = JSON.parse(savedData)
-      reset(parsedData)
+    const loadSavedData = async () => {
+      const savedData = getFromLocalStorage('shippingFormData')
+      const savedCountry = getFromLocalStorage('selectedCountry')
+      const savedShipping = getFromLocalStorage('selectedShipping')
+
+      try {
+        const [countriesData, shippingMethodsData] = await Promise.all([
+          fetchCountries(),
+          fetchShippingMethods(),
+        ])
+
+        setCountries(countriesData)
+        setShippingMethods(shippingMethodsData)
+
+        if (savedData) {
+          reset(savedData)
+        }
+
+        if (savedCountry) {
+          setValue('country', savedCountry)
+          setSelectedCountry(savedCountry)
+        }
+
+        if (savedShipping) {
+          setValue('shipping', savedShipping)
+          setSelectedShipping(savedShipping)
+          const selectedMethod = shippingMethodsData.find(
+            (method) => method.code === savedShipping,
+          )
+          if (selectedMethod && typeof onShippingChange === 'function') {
+            onShippingChange(selectedMethod.price.incl_tax)
+          }
+        }
+      } catch (error) {
+        console.error('Error loading data:', error)
+      }
     }
-  }, [reset])
 
-  const handleChange = (event) => {
-    const { name, value } = event.target
-    setValue(name, value, { shouldValidate: false })
+    loadSavedData()
+  }, [reset, setValue, onShippingChange])
 
-    const currentData = methods.getValues()
-    localStorage.setItem(
-      'shippingFormData',
-      JSON.stringify({ ...currentData, [name]: value }),
-    )
-  }
+  const handleChange = useCallback(
+    (event) => {
+      const { name, value } = event.target
+      setValue(name, value, { shouldValidate: false })
+
+      const currentData = getValues()
+      saveToLocalStorage('shippingFormData', currentData)
+
+      if (name === 'country') {
+        setSelectedCountry(value)
+        saveToLocalStorage('selectedCountry', value)
+      }
+
+      if (name === 'shipping') {
+        setSelectedShipping(value)
+        const selectedShippingMethod = shippingMethods.find(
+          (method) => method.code === value,
+        )
+        if (selectedShippingMethod && typeof onShippingChange === 'function') {
+          saveToLocalStorage('selectedShipping', value)
+          onShippingChange(selectedShippingMethod.price.incl_tax)
+        }
+      }
+    },
+    [setValue, getValues, shippingMethods, onShippingChange],
+  )
+
+  const handleSubmit = useCallback(
+    (data) => {
+      if (typeof onSubmit === 'function') {
+        onSubmit(data)
+      }
+    },
+    [onSubmit],
+  )
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={methods.handleSubmit(handleSubmit)} className="space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <GenericFormField
             name="first_name"
@@ -91,7 +168,7 @@ export function ShippingAddress({ onSubmit }) {
           />
           <GenericFormField
             name="line2"
-            label=""
+            label="Adresse complémentaire"
             type="input"
             onChange={handleChange}
           />
@@ -125,21 +202,24 @@ export function ShippingAddress({ onSubmit }) {
             name="country"
             label="Pays"
             type="select"
+            value={selectedCountry}
             options={countries
               .filter((country) => country.is_shipping_country)
               .map((country) => ({
                 value: country.url,
                 label: country.printable_name,
+                id: country.iso_3166_1_a3,
               }))}
             onChange={handleChange}
           />
           <GenericFormField
             name="shipping"
-            label="Envoi"
+            label="Méthode d'Envoi"
             type="select"
+            value={selectedShipping}
             options={shippingMethods.map((method) => ({
-              value: method.name,
-              label: `${method.price.currency} ${method.name} ${method.price.incl_tax}`,
+              value: method.code,
+              label: `${method.name} ${method.price.currency} ${method.price.incl_tax}`,
             }))}
             onChange={handleChange}
           />

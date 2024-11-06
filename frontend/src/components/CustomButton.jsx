@@ -1,8 +1,18 @@
-import { forwardRef } from 'react'
+import React, { forwardRef } from 'react'
 import { Button } from '@/components/ui/button'
 
 const CustomButton = forwardRef(
-  ({ onClick, IconComponent, variant, disabled, texte }, ref) => {
+  (
+    {
+      onClick,
+      IconComponent,
+      variant,
+      disabled,
+      texte,
+      'aria-label': ariaLabel,
+    },
+    ref,
+  ) => {
     return (
       <Button
         ref={ref}
@@ -11,6 +21,7 @@ const CustomButton = forwardRef(
         onClick={onClick}
         onMouseDown={(e) => e.preventDefault()}
         disabled={disabled}
+        aria-label={ariaLabel}
       >
         {texte}
         {IconComponent && <IconComponent className="h-6 w-6" />}

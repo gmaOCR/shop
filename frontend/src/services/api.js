@@ -14,3 +14,15 @@ export const fetchStockRecord = async (productId, stockrecordId) => {
   if (!response.ok) throw new Error('Failed to fetch stock record')
   return response.json()
 }
+
+export const fetchCountries = async () => {
+  const response = await fetch(`${API_BASE_URL}/countries/`)
+  if (!response.ok) throw new Error('Failed to fetch countries')
+  return response.json()
+}
+
+export const fetchShippingMethods = async () => {
+  const response = await fetch(`${API_BASE_URL}/basket/shipping-methods/`)
+  if (!response.ok) throw new Error('Failed to fetch shipping methods')
+  return response.json()
+}
