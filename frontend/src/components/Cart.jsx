@@ -30,8 +30,8 @@ function Cart() {
     clearCart()
   }
 
-  const handleCheckout = () => {
-    navigate('/checkout')
+  const handleShipping = () => {
+    navigate('/shipping')
   }
 
   if (error) {
@@ -79,7 +79,7 @@ function Cart() {
             </ul>
             <div className="text-right">
               <CustomButton
-                onClick={handleCheckout}
+                onClick={handleShipping}
                 texte="Aller à la caisse"
                 variant="outline"
               ></CustomButton>

@@ -1,9 +1,11 @@
+import { API_BASE_URL } from '../../services/api'
 import React, {
   createContext,
   useContext,
   useState,
   useCallback,
   useEffect,
+  useRef,
 } from 'react'
 
 const CartContext = createContext(null)
@@ -17,8 +19,9 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(null)
   const [lines, setLines] = useState([])
   const [error, setError] = useState(null)
+  const isMounted = useRef(false)
 
-  const getSessionId = useCallback(() => {
+  const getOrCreateSessionId = useCallback(() => {
     let sessionId = localStorage.getItem('oscarApiSessionId')
     if (!sessionId) {
       sessionId = `SID:ANON:localhost:${Math.random().toString(16).slice(2, 10)}`
@@ -32,11 +35,11 @@ export const CartProvider = ({ children }) => {
     setError(null)
 
     try {
-      const response = await fetch('http://localhost:8000/api/basket/', {
+      const response = await fetch(`${API_BASE_URL}/basket/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Session-Id': getSessionId(),
+          'Session-Id': getOrCreateSessionId(),
         },
       })
 
@@ -52,7 +55,7 @@ export const CartProvider = ({ children }) => {
     } finally {
       setLoading((prev) => ({ ...prev, cart: false }))
     }
-  }, [getSessionId])
+  }, [getOrCreateSessionId])
 
   const fetchLines = useCallback(async () => {
     if (!cart?.id) {
@@ -62,12 +65,12 @@ export const CartProvider = ({ children }) => {
     setLoading((prev) => ({ ...prev, lines: true }))
     try {
       const response = await fetch(
-        `http://localhost:8000/api/baskets/${cart.id}/lines/`,
+        `${API_BASE_URL}/baskets/${cart.id}/lines/`,
         {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Session-Id': getSessionId(),
+            'Session-Id': getOrCreateSessionId(),
           },
         },
       )
@@ -82,7 +85,7 @@ export const CartProvider = ({ children }) => {
     } finally {
       setLoading((prev) => ({ ...prev, lines: false }))
     }
-  }, [cart?.id, getSessionId])
+  }, [cart?.id, getOrCreateSessionId])
 
   const updateCart = useCallback(
     async (product, quantity) => {
@@ -91,25 +94,22 @@ export const CartProvider = ({ children }) => {
       setLoading((prev) => ({ ...prev, operation: true }))
       setError(null)
 
-      const sessionId = getSessionId()
-      const productUrl = `http://localhost:8000/api/products/${product.id}/`
+      const sessionId = getOrCreateSessionId()
+      const productUrl = `${API_BASE_URL}/products/${product.id}/`
       const requestBody = {
         url: productUrl,
         quantity: quantity,
       }
 
       try {
-        const response = await fetch(
-          `http://localhost:8000/api/basket/add-product/`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Session-Id': sessionId,
-            },
-            body: JSON.stringify(requestBody),
+        const response = await fetch(`${API_BASE_URL}/basket/add-product/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Session-Id': sessionId,
           },
-        )
+          body: JSON.stringify(requestBody),
+        })
 
         if (!response.ok) {
           const errorData = await response.json()
@@ -127,7 +127,7 @@ export const CartProvider = ({ children }) => {
         setLoading((prev) => ({ ...prev, operation: false }))
       }
     },
-    [fetchCart, fetchLines, getSessionId, loading.operation],
+    [fetchCart, fetchLines, getOrCreateSessionId, loading.operation],
   )
 
   const updateLineQuantity = useCallback(
@@ -148,7 +148,7 @@ export const CartProvider = ({ children }) => {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
-            'Session-Id': getSessionId(),
+            'Session-Id': getOrCreateSessionId(),
           },
           body: JSON.stringify({ quantity: newQuantity }),
         })
@@ -166,7 +166,7 @@ export const CartProvider = ({ children }) => {
         setLoading((prev) => ({ ...prev, operation: false }))
       }
     },
-    [fetchCart, fetchLines, getSessionId, loading.operation],
+    [fetchCart, fetchLines, getOrCreateSessionId, loading.operation],
   )
 
   const deleteLine = useCallback(
@@ -185,7 +185,7 @@ export const CartProvider = ({ children }) => {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
-            'Session-Id': getSessionId(),
+            'Session-Id': getOrCreateSessionId(),
           },
         })
 
@@ -202,7 +202,7 @@ export const CartProvider = ({ children }) => {
         setLoading((prev) => ({ ...prev, operation: false }))
       }
     },
-    [fetchCart, fetchLines, getSessionId, loading.operation],
+    [fetchCart, fetchLines, getOrCreateSessionId, loading.operation],
   )
 
   const clearCart = useCallback(async () => {
@@ -217,7 +217,7 @@ export const CartProvider = ({ children }) => {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
-            'Session-Id': getSessionId(),
+            'Session-Id': getOrCreateSessionId(),
           },
         })
 
@@ -234,10 +234,13 @@ export const CartProvider = ({ children }) => {
     } finally {
       setLoading((prev) => ({ ...prev, operation: false }))
     }
-  }, [lines, fetchCart, fetchLines, getSessionId, loading.operation])
+  }, [lines, fetchCart, fetchLines, getOrCreateSessionId, loading.operation])
 
   useEffect(() => {
-    fetchCart()
+    if (!isMounted.current) {
+      fetchCart()
+      isMounted.current = true
+    }
   }, [fetchCart])
 
   useEffect(() => {

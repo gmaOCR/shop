@@ -1,12 +1,21 @@
 from oscar.apps.shipping import repository
-from oscar.core.loading import get_class
-
-
-Standard = get_class('shipping.methods', 'Standard')
-Express = get_class('shipping.methods', 'Express')
+from . import methods
 
 
 class Repository(repository.Repository):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.methods = (Standard(), Express())
+    methods = (methods.Standard(), methods.Express(), methods.Slow())
+
+    def get_shipping_methods(self, basket, shipping_addr=None, **kwargs):
+        """
+        Return a list of all applicable shipping method instances for a given
+        basket, address etc. This method is intended to be overridden.
+        """
+
+        methods = self.get_available_shipping_methods(
+            basket=basket, shipping_addr=shipping_addr, **kwargs
+        )
+        if basket.has_shipping_discounts:
+            methods = self.apply_shipping_offers(basket, methods)
+        # import pdb
+        # pdb.set_trace()
+        return self.methods

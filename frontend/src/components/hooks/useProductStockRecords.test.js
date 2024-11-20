@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react'
-import { useProductStockRecords } from './useProductStockRecords'
+import { useProductStockRecords } from './useProductStockRecords.js.bak'
 
 // Mock de la fonction fetch globale
 global.fetch = jest.fn()

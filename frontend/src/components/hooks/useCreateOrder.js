@@ -48,6 +48,7 @@ export function useCreateOrder() {
       }
 
       const data = await response.json()
+      data.payment_url = 'http://localhost:5173/api-payment'
       setOrderData(data)
       return data
     } catch (err) {

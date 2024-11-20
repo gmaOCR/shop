@@ -1,5 +1,5 @@
-from oscar.apps.shipping.apps import ShippingConfig as CoreShippingConfig
+import oscar.apps.shipping.apps as apps
 
 
-class ShippingConfig(CoreShippingConfig):
+class ShippingConfig(apps.ShippingConfig):
     name = 'shipping'

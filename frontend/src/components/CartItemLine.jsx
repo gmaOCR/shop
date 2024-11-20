@@ -24,12 +24,12 @@ const CartItemLine = ({ line }) => {
     deleteLine,
     loading: { operation: operationLoading },
   } = useCartContext()
-
+  const { cart } = useCartContext()
   const product = products.find((p) => p.id === parseInt(productId))
 
   const { data: stockrecord, isLoading: stockLoading } = useQuery({
     queryKey: ['stockrecord', productId, stockrecordId],
-    queryFn: () => fetchStockRecord(productId, stockrecordId),
+    queryFn: () => fetchStockRecord(cart, productId, stockrecordId),
     enabled: !!productId && !!stockrecordId,
   })
 

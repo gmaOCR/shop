@@ -30,6 +30,7 @@ pycountry = "*"
 pysolr = "*"
 python-decouple = "*"
 psycopg2-binary = "*"
+stripe = "*"
 
 [dev-packages]
 django-extensions = "*"

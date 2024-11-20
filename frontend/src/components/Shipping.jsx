@@ -5,9 +5,14 @@ import CustomButton from './CustomButton'
 import { ShippingAddress } from './ShippingAddress'
 import { CartItemSkeleton } from './skeletons/CartItemLineSkeleton'
 import { ShippingAddressFormSkeleton } from './skeletons/ShippingAddressFormSkeleton'
-import { fetchCountries, fetchShippingMethods } from '../services/api'
+import {
+  fetchCountries,
+  fetchShippingMethods,
+  postPayment,
+} from '../services/api'
 import { useCreateOrder } from './hooks/useCreateOrder'
 import CartSummary from './CartSummary'
+import stripePromise from '../App'
 
 function Shipping() {
   const {
@@ -22,6 +27,8 @@ function Shipping() {
     error,
   } = useCartContext()
   const { createOrder } = useCreateOrder()
+  const [clientSecret, setClientSecret] = useState('')
+  const [dpmCheckerLink, setDpmCheckerLink] = useState('')
 
   // États pour les pays et méthodes d'expédition
   const [countries, setCountries] = useState([])
@@ -151,15 +158,33 @@ function Shipping() {
         shipping_method: shippingData.shipping,
         basket: cart.url,
         total: parseFloat(cart.total_incl_tax) + shippingCost,
+        currency: cart.currency,
       }
-
-      // Ajouter des logs de débogage
-      console.log('Order Data:', orderData)
 
       const response = await createOrder(orderData)
 
-      if (response.payment_url) {
-        window.location.href = response.payment_url
+      const paymentResponse = await postPayment({
+        amount: orderData.total,
+        currency: orderData.currency,
+      })
+
+      setClientSecret(paymentResponse.clientSecret)
+      setDpmCheckerLink(paymentResponse.dpmCheckerLink)
+
+      if (response.ok) {
+        // Wrap checkout in Stripe Elements if client secret is available
+        return (
+          <Elements
+            options={{
+              clientSecret: paymentResponse.clientSecret,
+              appearance: { theme: 'stripe' },
+              loader: 'auto',
+            }}
+            stripe={stripePromise}
+          >
+            <CheckoutForm dpmCheckerLink={paymentResponse.dpmCheckerLink} />
+          </Elements>
+        )
       } else {
         console.info('Commande créée avec succès')
         alert('Commande créée avec succès')
@@ -200,9 +225,7 @@ function Shipping() {
 
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Checkout</h2>
-
-      {/* Condition de chargement modifiée */}
+      <h2 className="text-2xl font-bold mb-4">Shipping</h2>
       {!initialLoadComplete ? (
         <>
           <ShippingAddressFormSkeleton />

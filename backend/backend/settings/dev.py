@@ -4,6 +4,11 @@ from oscar.defaults import *
 from decouple import config
 
 
+print("-------------------------\n"
+      "Developement config LOADED\n"
+      "-------------------------")
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -58,18 +63,14 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
         'drf_excel.renderers.XLSXRenderer',
-            ),
+    ),
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-print("-------------------------"
-      "Developement config LOADED"
-      "-------------------------")
-
-
-SHIPPING_METHODS = [
-    'backend.shipping.custom_shipping_methods.MyShippingMethod',
-]
-
 OSCAR_ALLOW_ANON_CHECKOUT = True
+
+STRIPE_TEST_API_KEY = "sk_test_51QKigELOM2fuF9oiwT73W9dZkVEv3qwbTPXj0sV26k0fw3jiaeUQh9og3sRY7ilZkPKCWy7tmOhRd9B5OTnbekhZ00WC7ctFp7"
+
+
+OSCAR_PAYMENT_URL = "http://localhost:8000/api/checkout/"

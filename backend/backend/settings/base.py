@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'api',
+    'payment_stripe',
     'phonenumber_field',
     'django_celery_results',
 
@@ -80,7 +81,8 @@ INSTALLED_APPS = [
 
 SITE_ID = 1
 
-## Set authentification and permissions in prod ##
+# Set authentification and permissions in prod #
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES':
         ('rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -90,7 +92,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
         'drf_excel.renderers.XLSXRenderer',
-    ),
+        ),
 }
 
 
@@ -247,6 +249,12 @@ CORS_ALLOW_HEADERS = [
     "x-session-id",
     "Session-Id",
     "Cookie",
+    "sessionid",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173'
+]
